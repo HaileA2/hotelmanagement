@@ -1,0 +1,262 @@
+<!-- public/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hotel Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <div class="bg-indigo-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out"
+            id="sidebar">
+            <div class="text-white flex items-center space-x-2 px-4">
+                <i class="fas fa-hotel text-2xl"></i>
+                <span class="text-2xl font-extrabold">HotelMS</span>
+            </div>
+            <nav>
+                <a href="dashboard.html" class="flex items-center px-4 py-3 text-white bg-indigo-900 rounded">
+                    <i class="fas fa-tachometer-alt w-6"></i>
+                    <span class="ml-3">Dashboard</span>
+                </a>
+                <a href="bookings.html" class="flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700 rounded">
+                    <i class="fas fa-calendar-check w-6"></i>
+                    <span class="ml-3">Bookings</span>
+                </a>
+                <a href="rooms.html" class="flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700 rounded">
+                    <i class="fas fa-bed w-6"></i>
+                    <span class="ml-3">Rooms</span>
+                </a>
+                <a href="guests.html" class="flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700 rounded">
+                    <i class="fas fa-users w-6"></i>
+                    <span class="ml-3">Guests</span>
+                </a>
+                <a href="payments.html" class="flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700 rounded">
+                    <i class="fas fa-credit-card w-6"></i>
+                    <span class="ml-3">Payments</span>
+                </a>
+                <a href="reports.html" class="flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700 rounded">
+                    <i class="fas fa-chart-bar w-6"></i>
+                    <span class="ml-3">Reports</span>
+                </a>
+                <a href="settings.html" class="flex items-center px-4 py-3 text-indigo-100 hover:bg-indigo-700 rounded">
+                    <i class="fas fa-cog w-6"></i>
+                    <span class="ml-3">Settings</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button id="sidebarToggle" class="text-gray-500 focus:outline-none md:hidden">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800 ml-4">Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-bell text-xl"></i>
+                        </button>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">
+                                    U</div>
+                                <span class="hidden md:inline-block">User</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div x-show="open" @click.away="open = false"
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="profile.html"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                                <a href="settings.html"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="#" id="logoutBtn"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div id="errorContainer"
+                    class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                    role="alert"></div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-indigo-100 text-indigo-600">
+                                <i class="fas fa-calendar-check text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Total Bookings</p>
+                                <h3 class="text-2xl font-semibold" id="totalBookings">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-bed text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Available Rooms</p>
+                                <h3 class="text-2xl font-semibold" id="availableRooms">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-user-check text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Today's Check-ins</p>
+                                <h3 class="text-2xl font-semibold" id="todayCheckIns">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-dollar-sign text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Monthly Revenue</p>
+                                <h3 class="text-2xl font-semibold" id="monthlyRevenue">$0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Revenue Overview</h2>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none bg-white border border-gray-300 text-gray-700 py-1 px-3 pr-8 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                    <option>This Month</option>
+                                    <option>Last Month</option>
+                                    <option>Last 6 Months</option>
+                                    <option>This Year</option>
+                                </select>
+                                <div
+                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="revenueChart" style="min-height: 300px;"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Room Occupancy</h2>
+                            <button id="refreshBtn" class="text-indigo-600 hover:text-indigo-800">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div id="occupancyChart" style="min-height: 300px;"></div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Check-ins & Recent Bookings -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Upcoming Check-ins -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Upcoming Check-ins</h2>
+                            <a href="bookings.html?filter=upcoming"
+                                class="text-sm text-indigo-600 hover:text-indigo-800">View All</a>
+                        </div>
+                        <div id="upcomingCheckIns">
+                            <!-- Check-in items will be added here by JavaScript -->
+                            <div class="flex items-center justify-center py-8 text-gray-500">
+                                <i class="fas fa-spinner fa-spin mr-2"></i> Loading...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Bookings -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Recent Bookings</h2>
+                            <a href="bookings.html" class="text-sm text-indigo-600 hover:text-indigo-800">View All</a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            ID</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Guest</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Check-in</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentBookings" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                            <i class="fas fa-spinner fa-spin mr-2"></i> Loading...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-white border-t border-gray-200 py-4">
+                <div class="container mx-auto px-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <p class="text-gray-600 text-sm">© 2023 Hotel Management System. All rights reserved.</p>
+                        <div class="flex space-x-4 mt-4 md:mt-0">
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- JavaScript -->
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

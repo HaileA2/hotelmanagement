@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Room - Hotel Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex flex-col">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <i class="fas fa-hotel text-indigo-600 text-2xl"></i>
+                            <span class="ml-2 text-xl font-semibold">HotelMS</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <a href="dashboard.html" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-grow container mx-auto px-4 py-8">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                    <div class="bg-indigo-600 px-6 py-4">
+                        <h1 class="text-xl font-semibold text-white">Update Room Details</h1>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 hidden"></div>
+                        <div id="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 hidden"></div>
+                        
+                        <form id="updateRoomForm" class="space-y-6">
+                            <input type="hidden" id="roomId">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="roomType" class="block text-sm font-medium text-gray-700">Room Type</label>
+                                    <select id="roomType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
+                                        <option value="Single">Single</option>
+                                        <option value="Double">Double</option>
+                                        <option value="Deluxe">Deluxe</option>
+                                        <option value="Suite">Suite</option>
+                                        <option value="Executive">Executive</option>
+                                        <option value="Presidential">Presidential</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label for="pricePerNight" class="block text-sm font-medium text-gray-700">Price Per Night ($)</label>
+                                    <input type="number" id="pricePerNight" step="0.01" min="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="capacity" class="block text-sm font-medium text-gray-700">Max Occupancy</label>
+                                    <input type="number" id="capacity" min="1" max="10" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                    <select id="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
+                                        <option value="Available">Available</option>
+                                        <option value="Booked">Booked</option>
+                                        <option value="Maintenance">Under Maintenance</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="amenities" class="block text-sm font-medium text-gray-700">Amenities (comma separated)</label>
+                                <input type="text" id="amenities" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., WiFi, TV, AC, Mini Bar">
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 pt-4">
+                                <button type="button" id="cancelBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Cancel
+                                </button>
+                                <button type="submit" id="updateRoomBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <span id="btnText">Update Room</span>
+                                    <span id="btnSpinner" class="ml-2 hidden">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get room ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('id');
+            
+            if (!roomId) {
+                showError('Room ID is missing from the URL');
+                return;
+            }
+            
+            // Set room ID in hidden field
+            document.getElementById('roomId').value = roomId;
+            
+            // Load room data
+            loadRoomData(roomId);
+            
+            // Form submission
+            document.getElementById('updateRoomForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateRoom(roomId);
+            });
+            
+            // Cancel button
+            document.getElementById('cancelBtn').addEventListener('click', function() {
+                window.location.href = 'room-list.html';
+            });
+        });
+        
+        async function loadRoomData(roomId) {
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`/hotel-management-system/api/room/read_one.php?id=${roomId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to load room data');
+                }
+                
+                // Populate form fields
+                document.getElementById('roomType').value = data.type || 'Single';
+                document.getElementById('pricePerNight').value = data.price || '';
+                document.getElementById('capacity').value = data.max_occupancy || 1;
+                document.getElementById('status').value = data.availability || 'Available';
+                document.getElementById('description').value = data.description || '';
+                document.getElementById('amenities').value = data.amenities || '';
+                
+            } catch (error) {
+                showError(error.message || 'An error occurred while loading room data');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function updateRoom(roomId) {
+            try {
+                showLoading(true);
+                hideMessages();
+                
+                const roomData = {
+                    id: roomId,
+                    type: document.getElementById('roomType').value,
+                    price: parseFloat(document.getElementById('pricePerNight').value),
+                    capacity: parseInt(document.getElementById('capacity').value),
+                    status: document.getElementById('status').value,
+                    description: document.getElementById('description').value,
+                    amenities: document.getElementById('amenities').value
+                };
+                
+                // Basic validation
+                if (isNaN(roomData.price) || roomData.price <= 0) {
+                    throw new Error('Please enter a valid price');
+                }
+                
+                if (isNaN(roomData.capacity) || roomData.capacity < 1) {
+                    throw new Error('Please enter a valid capacity');
+                }
+                
+                const response = await fetch('/hotel-management-system/api/room/update_room.php', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                    },
+                    body: JSON.stringify(roomData)
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to update room');
+                }
+                
+                showSuccess('Room updated successfully!');
+                setTimeout(() => {
+                    window.location.href = 'room-list.html';
+                }, 1500);
+                
+            } catch (error) {
+                showError(error.message || 'An error occurred while updating the room');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function showLoading(show) {
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const updateBtn = document.getElementById('updateRoomBtn');
+            
+            if (show) {
+                btnText.textContent = 'Updating...';
+                btnSpinner.classList.remove('hidden');
+                updateBtn.disabled = true;
+            } else {
+                btnText.textContent = 'Update Room';
+                btnSpinner.classList.add('hidden');
+                updateBtn.disabled = false;
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function hideMessages() {
+            document.getElementById('errorMessage').classList.add('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
