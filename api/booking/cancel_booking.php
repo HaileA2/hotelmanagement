@@ -51,8 +51,7 @@ $booking = new Booking($db);
 $booking->id = $data->booking_id;
 
 // Get the booking details to check ownership
-$stmt = $booking->getById($data->booking_id);
-$booking_data = $stmt->fetch(PDO::FETCH_ASSOC);
+$booking_data = $booking->getById($data->booking_id);
 
 if (!$booking_data) {
     http_response_code(404);

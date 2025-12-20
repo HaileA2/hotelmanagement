@@ -24,8 +24,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 // Get JWT token from header
-$headers = getallheaders();
-$authHeader = $headers['Authorization'] ?? '';
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 $token = null;
 
 // Extract the token from the Authorization header
@@ -65,76 +64,47 @@ try {
     
     // Update user fields if provided
     $update_fields = [];
-    $set_parts = [];
-    $params = [':id' => $user_id];
-
+    
     if (isset($data->email)) {
         $user->email = $data->email;
-        $set_parts[] = 'email = :email';
-        $params[':email'] = $user->email;
         $update_fields[] = 'email';
     }
-
-    if (isset($data->first_name)) {
-        $user->first_name = $data->first_name;
-        $set_parts[] = 'first_name = :first_name';
-        $params[':first_name'] = $user->first_name;
-        $update_fields[] = 'first_name';
-    }
-
-    if (isset($data->last_name)) {
-        $user->last_name = $data->last_name;
-        $set_parts[] = 'last_name = :last_name';
-        $params[':last_name'] = $user->last_name;
-        $update_fields[] = 'last_name';
-    }
-
+    
     if (isset($data->password) && !empty(trim($data->password))) {
         // Hash the password before saving
         $user->password = password_hash($data->password, PASSWORD_BCRYPT);
-        $set_parts[] = 'password = :password';
-        $params[':password'] = $user->password;
         $update_fields[] = 'password';
     }
-
+    
     if (isset($data->role)) {
-        $user->role = strtolower($data->role);
-        $set_parts[] = 'role = :role';
-        $params[':role'] = $user->role;
+        $user->role = $data->role;
         $update_fields[] = 'role';
     }
-
-    if (isset($data->professional_details)) {
-        if (is_string($data->professional_details)) {
-            $user->professional_details = $data->professional_details;
+    
+    if (isset($data->details)) {
+        if (is_string($data->details)) {
+            $user->details = $data->details;
         } else {
-            $user->professional_details = json_encode($data->professional_details);
+            $user->details = json_encode($data->details);
         }
-        $set_parts[] = 'professional_details = :professional_details';
-        $params[':professional_details'] = $user->professional_details;
-        $update_fields[] = 'professional_details';
+        $update_fields[] = 'details';
     }
-
+    
     if (empty($update_fields)) {
         throw new Exception('No fields to update');
     }
-
-    $set_parts[] = 'updated_at = NOW()';
-    $query = "UPDATE users SET " . implode(', ', $set_parts) . " WHERE id = :id";
-
-    $stmt = $db->prepare($query);
-    if ($stmt->execute($params)) {
+    
+    // Update the user
+    if ($user->update()) {
         // Fetch updated user data
-        if ($user->getById($user_id)) {
+        if ($user->readOne()) {
             $user_data = [
                 'id' => $user->id,
                 'email' => $user->email,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
                 'role' => $user->role,
-                'professional_details' => json_decode($user->professional_details ?? '{}', true)
+                'details' => json_decode($user->details ?? '{}', true)
             ];
-
+            
             http_response_code(200);
             echo json_encode([
                 "status" => "success",

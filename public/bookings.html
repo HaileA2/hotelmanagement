@@ -55,17 +55,17 @@
             <header class="bg-white shadow-sm">
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center">
-                        <button id="sidebarToggle" class="text-gray-500 focus:outline-none md:hidden">
+                        <button id="sidebarToggle" type="button" aria-label="Toggle sidebar" class="text-gray-500 focus:outline-none md:hidden">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
                         <h1 class="text-xl font-semibold text-gray-800 ml-4">Bookings</h1>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <button type="button" aria-label="Notifications" class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
                             <i class="fas fa-bell text-xl"></i>
                         </button>
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                            <button type="button" @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
                                 <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">U</div>
                                 <span class="hidden md:inline-block">User</span>
                                 <i class="fas fa-chevron-down text-xs"></i>
@@ -97,7 +97,7 @@
                         </div>
                         <div class="flex space-x-3">
                             <div>
-                                <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <select id="statusFilter" aria-label="Filter by status" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                     <option value="">All Status</option>
                                     <option value="confirmed">Confirmed</option>
                                     <option value="pending">Pending</option>
@@ -108,7 +108,7 @@
                             <div>
                                 <input type="text" id="dateRange" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" placeholder="Select date range">
                             </div>
-                            <button id="newBookingBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <button type="button" id="newBookingBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 <i class="fas fa-plus mr-2"></i> New Booking
                             </button>
                         </div>
@@ -178,13 +178,13 @@
                     <div class="flex flex-col md:flex-row justify-between items-center">
                         <p class="text-gray-600 text-sm">© 2025 Hotel Management System. All rights reserved.</p>
                         <div class="flex space-x-4 mt-4 md:mt-0">
-                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                            <a href="#" class="text-gray-500 hover:text-gray-700" aria-label="Facebook">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                            <a href="#" class="text-gray-500 hover:text-gray-700" aria-label="Twitter">
                                 <i class="fab fa-twitter"></i>
                             </a>
-                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                            <a href="#" class="text-gray-500 hover:text-gray-700" aria-label="Instagram">
                                 <i class="fab fa-instagram"></i>
                             </a>
                         </div>
@@ -199,7 +199,7 @@
         <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center pb-3 border-b">
                 <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Booking Details</h3>
-                <button type="button" id="closeModal" class="text-gray-400 hover:text-gray-500">
+                <button type="button" id="closeModal" aria-label="Close modal" class="text-gray-400 hover:text-gray-500">
                     <i class="fas fa-times"></i>
                 </button>
             </div>

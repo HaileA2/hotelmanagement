@@ -34,11 +34,11 @@ if (empty($authHeader) || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches))
 $token = $matches[1];
 $jwt = new JwtHandler();
 
-// Verify token and check if user is admin
+// Verify token and check if user is admin or manager
 $tokenData = $jwt->getTokenPayload($token);
-if (!$jwt->validateToken($token) || $tokenData['role'] !== 'admin') {
+if (!$jwt->validateToken($token) || !in_array($tokenData['role'], ['admin', 'manager'])) {
     http_response_code(403);
-    echo json_encode(["message" => "Unauthorized. Admin access required."]);
+    echo json_encode(["message" => "Unauthorized. Admin or Manager access required."]);
     exit();
 }
 

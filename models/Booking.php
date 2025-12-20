@@ -95,16 +95,16 @@ class Booking {
     // Get all bookings (for admin)
     public function getAllBookings() {
         try {
-            $query = "SELECT 
-                        b.*, 
-                        h.name as hotel_name, 
-                        r.type as room_type, 
+            $query = "SELECT
+                        b.*,
+                        h.name as hotel_name,
+                        r.type as room_type,
                         r.price_per_night as room_price,
                         r.id as room_id,
                         h.id as hotel_id,
                         u.email as guest_email,
-                        JSON_UNQUOTE(JSON_EXTRACT(u.details, '$.first_name')) as first_name,
-                        JSON_UNQUOTE(JSON_EXTRACT(u.details, '$.last_name')) as last_name
+                        u.first_name as first_name,
+                        u.last_name as last_name
                      FROM " . $this->table_name . " b
                      INNER JOIN hotels h ON b.hotel_id = h.id
                      INNER JOIN rooms r ON b.room_id = r.id
@@ -124,19 +124,19 @@ class Booking {
 
     // Get booking by ID
     public function getById($id) {
-        $query = "SELECT b.*, h.name as hotel_name, r.type as room_type, r.price_per_night as room_price 
+        $query = "SELECT b.*, h.name as hotel_name, r.type as room_type, r.price_per_night as room_price
                  FROM " . $this->table_name . " b
                  JOIN hotels h ON b.hotel_id = h.id
                  JOIN rooms r ON b.room_id = r.id
                  WHERE b.id = ?
                  LIMIT 0,1";
-        
+
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $id);
         $stmt->execute();
-        
+
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($row) {
             $this->id = $row['id'];
             $this->user_id = $row['user_id'];
@@ -150,31 +150,67 @@ class Booking {
             $this->guest_count = $row['guest_count'];
             $this->special_requests = $row['special_requests'];
             $this->created_at = $row['created_at'];
-            
-            return true;
+
+            return $row; // Return the row data
         }
-        
+
         return false;
     }
 
     // Update booking status
-    public function updateStatus($status) {
-        $query = "UPDATE " . $this->table_name . " 
-                 SET status = :status 
-                 WHERE id = :id";
+    public function updateStatus() {
+        $query = "UPDATE " . $this->table_name . "
+                  SET status = :status
+                  WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
-        
-        $this->status = htmlspecialchars(strip_tags($status));
+
+        $this->status = htmlspecialchars(strip_tags($this->status));
         $this->id = htmlspecialchars(strip_tags($this->id));
-        
+
         $stmt->bindParam(':status', $this->status);
         $stmt->bindParam(':id', $this->id);
-        
+
         if ($stmt->execute()) {
             return true;
         }
-        
+
+        return false;
+    }
+
+    // Update booking details
+    public function update() {
+        // First check if the new room/dates are available
+        if (!$this->checkAvailability($this->room_id, $this->check_in, $this->check_out, $this->id)) {
+            return false;
+        }
+
+        $query = "UPDATE " . $this->table_name . "
+                 SET room_id=:room_id, check_in=:check_in, check_out=:check_out,
+                     guest_count=:guest_count, special_requests=:special_requests
+                 WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        // Sanitize
+        $this->room_id = htmlspecialchars(strip_tags($this->room_id));
+        $this->check_in = htmlspecialchars(strip_tags($this->check_in));
+        $this->check_out = htmlspecialchars(strip_tags($this->check_out));
+        $this->guest_count = htmlspecialchars(strip_tags($this->guest_count));
+        $this->special_requests = htmlspecialchars(strip_tags($this->special_requests));
+        $this->id = htmlspecialchars(strip_tags($this->id));
+
+        // Bind values
+        $stmt->bindParam(":room_id", $this->room_id);
+        $stmt->bindParam(":check_in", $this->check_in);
+        $stmt->bindParam(":check_out", $this->check_out);
+        $stmt->bindParam(":guest_count", $this->guest_count);
+        $stmt->bindParam(":special_requests", $this->special_requests);
+        $stmt->bindParam(":id", $this->id);
+
+        if ($stmt->execute()) {
+            return true;
+        }
         return false;
     }
 

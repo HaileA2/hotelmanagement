@@ -10,7 +10,7 @@ class User {
     public $password;
     public $first_name;
     public $last_name;
-    public $role; // 'Admin', 'Manager', 'Customer'
+    public $role; // 'admin', 'manager', 'customer'
     public $professional_details; // JSON string for professional information
     public $email_verified = false;
     public $verification_token;
@@ -43,7 +43,7 @@ class User {
         $stmt = $this->conn->prepare($query);
 
         // Validate role
-        $valid_roles = ['Admin', 'Manager', 'Customer'];
+        $valid_roles = ['admin', 'manager', 'customer'];
         if (!in_array($this->role, $valid_roles)) {
             throw new Exception('Invalid role specified. Must be one of: ' . implode(', ', $valid_roles));
         }
@@ -52,12 +52,12 @@ class User {
         $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
         $this->first_name = $this->sanitizeName($this->first_name);
         $this->last_name = $this->sanitizeName($this->last_name);
-        $this->role = ucfirst(strtolower($this->role)); // Ensure proper case
+        $this->role = strtolower($this->role); // Ensure lowercase
         
-        // Validate professional details for managers and tour guides
-        if (in_array($this->role, ['Manager', 'TourGuide'])) {
+        // Validate professional details for managers
+        if ($this->role === 'manager') {
             if (empty($this->professional_details)) {
-                throw new Exception('Professional details are required for ' . $this->role . ' role');
+                throw new Exception('Professional details are required for manager role');
             }
             if (!is_string($this->professional_details)) {
                 $this->professional_details = json_encode($this->professional_details, JSON_UNESCAPED_UNICODE);
@@ -126,7 +126,7 @@ class User {
             $this->password = $row['password'];
             $this->first_name = $row['first_name'];
             $this->last_name = $row['last_name'];
-            $this->role = $row['role'];
+            $this->role = strtolower($row['role']);
             $this->created_at = $row['created_at'];
             
             // Verify the password hash format
@@ -189,11 +189,11 @@ class User {
     }
 
     public function getById($id) {
-        $query = "SELECT id, email, first_name, last_name, role, professional_details, 
-                        email_verified, created_at, updated_at 
-                 FROM " . $this->table_name . " 
-                 WHERE id = ? 
-                 LIMIT 0,1";
+        $query = "SELECT id, email, first_name, last_name, role, professional_details,
+                        email_verified, created_at, updated_at
+                  FROM " . $this->table_name . "
+                  WHERE id = ?
+                  LIMIT 0,1";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $id);
@@ -206,7 +206,7 @@ class User {
             $this->email = $row['email'];
             $this->first_name = $row['first_name'];
             $this->last_name = $row['last_name'];
-            $this->role = $row['role'];
+            $this->role = strtolower($row['role']);
             $this->professional_details = $row['professional_details'];
             $this->email_verified = (bool)$row['email_verified'];
             $this->created_at = $row['created_at'];
@@ -214,6 +214,42 @@ class User {
             return true;
         }
         return false;
+    }
+
+    public function update() {
+        $query = "UPDATE " . $this->table_name . " SET
+                  email = :email,
+                  first_name = :first_name,
+                  last_name = :last_name,
+                  password = :password,
+                  role = :role,
+                  professional_details = :professional_details,
+                  updated_at = NOW()
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        // Sanitize
+        $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
+        $this->first_name = $this->sanitizeName($this->first_name);
+        $this->last_name = $this->sanitizeName($this->last_name);
+        $this->role = strtolower($this->role);
+
+        // Bind values
+        $stmt->bindParam(':email', $this->email);
+        $stmt->bindParam(':first_name', $this->first_name);
+        $stmt->bindParam(':last_name', $this->last_name);
+        $stmt->bindParam(':password', $this->password);
+        $stmt->bindParam(':role', $this->role);
+        $stmt->bindParam(':professional_details', $this->professional_details);
+        $stmt->bindParam(':id', $this->id);
+
+        if($stmt->execute()) {
+            return true;
+        }
+
+        $error = $stmt->errorInfo();
+        throw new Exception('Database error: ' . ($error[2] ?? 'Unknown error'));
     }
 }
 ?>

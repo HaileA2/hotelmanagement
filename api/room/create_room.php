@@ -53,11 +53,11 @@ if (!$jwt->validateToken($token)) {
     exit();
 }
 
-// Check if user is admin
+// Check if user is admin or manager
 $payload = $jwt->getTokenPayload($token);
-if ($payload['role'] !== 'admin') {
+if (!in_array($payload['role'], ['admin', 'manager'])) {
     http_response_code(403);
-    echo json_encode(["message" => "Admin access required."]);
+    echo json_encode(["message" => "Admin or Manager access required."]);
     exit();
 }
 

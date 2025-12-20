@@ -53,18 +53,18 @@ try {
         sendResponse(400, 'Password must contain at least one special character.');
     }
 
-    // Set default role to 'Customer' if not provided
-    $data->role = isset($data->role) ? ucfirst(strtolower($data->role)) : 'Customer';
+    // Set default role to 'customer' if not provided
+    $data->role = isset($data->role) ? strtolower($data->role) : 'customer';
     
     // Validate role
-    $valid_roles = ['Admin', 'Manager', 'Customer'];
+    $valid_roles = ['admin', 'manager', 'customer'];
     if (!in_array($data->role, $valid_roles)) {
         sendResponse(400, "Invalid role specified. Must be one of: " . implode(', ', $valid_roles));
     }
 
-    // Validate professional details for managers and tour guides
-    if (in_array($data->role, ['Manager', 'TourGuide']) && empty($data->professional_details)) {
-        sendResponse(400, 'Professional details are required for ' . $data->role . ' role');
+    // Validate professional details for managers
+    if ($data->role === 'manager' && empty($data->professional_details)) {
+        sendResponse(400, 'Professional details are required for manager role');
     }
 
     // Initialize database connection
