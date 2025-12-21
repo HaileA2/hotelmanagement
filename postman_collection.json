@@ -1,0 +1,1027 @@
+{
+  "info": {
+    "name": "Hotel Management System API",
+    "description": "Complete API collection for Hotel Management System with JWT authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"user@example.com\",\"password\":\"Password123!\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"role\":\"customer\",\"professional_details\":null}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register.php"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.token) {",
+                  "        pm.environment.set('token', response.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"user@example.com\",\"password\":\"Password123!\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login.php"]
+            }
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout.php"]
+            }
+          }
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify.php?token={{verification_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify.php"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{verification_token}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hotel Management",
+      "item": [
+        {
+          "name": "Create Hotel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Grand Hotel\",\"description\":\"Luxury hotel\",\"address\":\"123 Main St\",\"city\":\"New York\",\"country\":\"USA\",\"rating\":4.5,\"amenities\":[\"WiFi\",\"Pool\"]}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotel/create_hotel.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hotel", "create_hotel.php"]
+            }
+          }
+        },
+        {
+          "name": "List Hotels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/hotel/list_hotels.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hotel", "list_hotels.php"]
+            }
+          }
+        },
+        {
+          "name": "Update Hotel",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1,\"name\":\"Updated Hotel Name\",\"description\":\"Updated description\",\"address\":\"123 Main St\",\"city\":\"New York\",\"country\":\"USA\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotel/update_hotel.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hotel", "update_hotel.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Hotel",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotel/delete_hotel.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hotel", "delete_hotel.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Amenity to Hotel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"hotel_id\":1,\"amenity_id\":1}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotel/add_amenity.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hotel", "add_amenity.php"]
+            }
+          }
+        },
+        {
+          "name": "Remove Amenity from Hotel",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotel/remove_amenity.php?hotel_id=1&amenity_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hotel", "remove_amenity.php"],
+              "query": [
+                {
+                  "key": "hotel_id",
+                  "value": "1"
+                },
+                {
+                  "key": "amenity_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Room Management",
+      "item": [
+        {
+          "name": "Create Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"hotel_id\":1,\"type\":\"Deluxe\",\"price_per_night\":150.00,\"max_occupancy\":2}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/room/create_room.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "room", "create_room.php"]
+            }
+          }
+        },
+        {
+          "name": "List Rooms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/room/list_rooms.php?hotel_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "room", "list_rooms.php"],
+              "query": [
+                {
+                  "key": "hotel_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Room",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"price_per_night\":200.00}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/room/update_room.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "room", "update_room.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Room",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/room/delete_room.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "room", "delete_room.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Check Room Availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/room/check_availability.php?room_id=1&check_in=2023-12-01&check_out=2023-12-05",
+              "host": ["{{base_url}}"],
+              "path": ["api", "room", "check_availability.php"],
+              "query": [
+                {
+                  "key": "room_id",
+                  "value": "1"
+                },
+                {
+                  "key": "check_in",
+                  "value": "2023-12-01"
+                },
+                {
+                  "key": "check_out",
+                  "value": "2023-12-05"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Room Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/room/types.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "room", "types.php"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booking Management",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"room_id\":1,\"hotel_id\":1,\"check_in\":\"2023-12-01\",\"check_out\":\"2023-12-05\",\"guest_count\":2,\"total_price\":600.00,\"special_requests\":\"Late check-in\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/booking/create_booking.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "booking", "create_booking.php"]
+            }
+          }
+        },
+        {
+          "name": "List Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/booking/list_bookings.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "booking", "list_bookings.php"]
+            }
+          }
+        },
+        {
+          "name": "Update Booking",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"check_out\":\"2023-12-06\",\"total_price\":750.00}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/booking/update_booking.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "booking", "update_booking.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"booking_id\":1}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/booking/cancel_booking.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "booking", "cancel_booking.php"]
+            }
+          }
+        },
+        {
+          "name": "Booking History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/booking/booking_history.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "booking", "booking_history.php"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/profile.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "profile.php"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"first_name\":\"Jane\",\"last_name\":\"Smith\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user/update_profile.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "update_profile.php"]
+            }
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/list_users.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "list_users.php"]
+            }
+          }
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/update_role.php?id=1&role=manager",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "update_role.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "role",
+                  "value": "manager"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/delete_user.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "delete_user.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Service Management",
+      "item": [
+        {
+          "name": "Create Service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Spa Treatment\",\"description\":\"Relaxing massage\",\"price\":100.00,\"duration_minutes\":60,\"is_available\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/service/create.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "service", "create.php"]
+            }
+          }
+        },
+        {
+          "name": "List Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/service/list.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "service", "list.php"]
+            }
+          }
+        },
+        {
+          "name": "Update Service",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"price\":120.00}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/service/update.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "service", "update.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Service",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/service/delete.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "service", "delete.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "External Services",
+      "item": [
+        {
+          "name": "Get Restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/services/restaurants.php?location=New York",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "restaurants.php"],
+              "query": [
+                {
+                  "key": "location",
+                  "value": "New York"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Taxis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/services/taxis.php?pickup=Hotel&dropoff=Airport",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "taxis.php"],
+              "query": [
+                {
+                  "key": "pickup",
+                  "value": "Hotel"
+                },
+                {
+                  "key": "dropoff",
+                  "value": "Airport"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tours",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/services/tours.php?destination=Paris",
+              "host": ["{{base_url}}"],
+              "path": ["api", "services", "tours.php"],
+              "query": [
+                {
+                  "key": "destination",
+                  "value": "Paris"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Amenities Management",
+      "item": [
+        {
+          "name": "Create Amenity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Free WiFi\",\"icon\":\"wifi\",\"description\":\"High-speed internet\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/amenities/create.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "amenities", "create.php"]
+            }
+          }
+        },
+        {
+          "name": "Read Amenities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/amenities/read.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "amenities", "read.php"]
+            }
+          }
+        },
+        {
+          "name": "Update Amenity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"description\":\"Updated description\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/amenities/update.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "amenities", "update.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Amenity",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/amenities/delete.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "amenities", "delete.php"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports & Statistics",
+      "item": [
+        {
+          "name": "Occupancy Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/occupancy.php?start_date=2023-01-01&end_date=2023-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "occupancy.php"],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2023-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2023-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Revenue Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/revenue.php?start_date=2023-01-01&end_date=2023-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "revenue.php"],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2023-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2023-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Booking Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/bookings.php?hotel_id=1&start_date=2023-01-01&end_date=2023-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "bookings.php"],
+              "query": [
+                {
+                  "key": "hotel_id",
+                  "value": "1"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2023-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2023-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visitor Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/visitors.php?hotel_id=1&start_date=2023-01-01&end_date=2023-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "visitors.php"],
+              "query": [
+                {
+                  "key": "hotel_id",
+                  "value": "1"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2023-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2023-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/hotel-management-system",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verification_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

@@ -6,7 +6,7 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 include_once '../../config/database.php';
-include_once '../helpers/jwt_helper.php';
+include_once '../../helpers/jwt_helper.php';
 include_once '../../classes/ReportGenerator.php';
 
 $database = new Database();
@@ -38,14 +38,14 @@ try {
     
     // If manager, they can only see their hotel's data
     if ($payload['role'] === 'Manager') {
-        $hotel_id = $this->getManagerHotelId($db, $payload['user_id']);
+        $hotel_id = getManagerHotelId($db, $payload['user_id']);
     }
     
     // Initialize report generator
     $report = new ReportGenerator($db, $start_date, $end_date, $hotel_id);
-    
+
     // Get occupancy data
-    $occupancyData = $this->getOccupancyData($db, $report);
+    $occupancyData = getOccupancyData($db, $report);
     
     // Format response based on requested format
     switch ($format) {
@@ -67,8 +67,8 @@ try {
                 'status' => 'success',
                 'data' => $occupancyData,
                 'meta' => [
-                    'start_date' => $report->start_date,
-                    'end_date' => $report->end_date,
+                    'start_date' => $report->getStartDate(),
+                    'end_date' => $report->getEndDate(),
                     'hotel_id' => $hotel_id,
                     'generated_at' => date('Y-m-d H:i:s')
                 ]
@@ -97,12 +97,12 @@ function getOccupancyData($db, $report) {
             h.name AS hotel_name,
             COUNT(DISTINCT b.id) AS bookings_count,
             COUNT(DISTINCT r.id) AS rooms_occupied,
-            (SELECT COUNT(DISTINCT id) FROM rooms WHERE status = 'available' " . 
-            ($report->hotel_id ? " AND hotel_id = :hotel_id" : "") . 
+            (SELECT COUNT(DISTINCT id) FROM rooms WHERE status = 'available' " .
+            ($report->getHotelId() ? " AND hotel_id = :hotel_id" : "") .
             ") AS total_rooms,
-            ROUND((COUNT(DISTINCT r.id) / 
-                (SELECT COUNT(DISTINCT id) FROM rooms WHERE status = 'available' " . 
-                ($report->hotel_id ? " AND hotel_id = :hotel_id2" : "") . 
+            ROUND((COUNT(DISTINCT r.id) /
+                (SELECT COUNT(DISTINCT id) FROM rooms WHERE status = 'available' " .
+                ($report->getHotelId() ? " AND hotel_id = :hotel_id2" : "") .
                 ") * 100, 2) AS occupancy_rate
         FROM bookings b
         JOIN rooms r ON b.room_id = r.id
@@ -117,8 +117,8 @@ function getOccupancyData($db, $report) {
     ";
     
     $params = $where['params'];
-    if ($report->hotel_id) {
-        $params[':hotel_id2'] = $report->hotel_id;
+    if ($report->getHotelId()) {
+        $params[':hotel_id2'] = $report->getHotelId();
     }
     
     $stmt = $db->prepare($query);

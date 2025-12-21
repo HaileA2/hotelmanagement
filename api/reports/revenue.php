@@ -6,7 +6,7 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 include_once '../../config/database.php';
-include_once '../helpers/jwt_helper.php';
+include_once '../../helpers/jwt_helper.php';
 include_once '../../classes/ReportGenerator.php';
 
 $database = new Database();
@@ -105,9 +105,9 @@ try {
                     'revenue_per_available_room' => calculateRevPAR($db, $report, $totalRevenue)
                 ],
                 'meta' => [
-                    'start_date' => $report->start_date,
-                    'end_date' => $report->end_date,
-                    'hotel_id' => $hotel_id,
+                    'start_date' => $report->getStartDate(),
+                    'end_date' => $report->getEndDate(),
+                    'hotel_id' => $report->getHotelId(),
                     'group_by' => $group_by,
                     'generated_at' => date('Y-m-d H:i:s')
                 ]
@@ -231,9 +231,9 @@ function calculateRevPAR($db, $report, $revenue, $period = null, $group_by = nul
         $query = "SELECT COUNT(*) as room_count FROM rooms WHERE status = 'available'";
         $params = [];
         
-        if ($report->hotel_id) {
+        if ($report->getHotelId()) {
             $query .= " AND hotel_id = :hotel_id";
-            $params[':hotel_id'] = $report->hotel_id;
+            $params[':hotel_id'] = $report->getHotelId();
         }
         
         $stmt = $db->prepare($query);
@@ -254,8 +254,8 @@ function calculateRevPAR($db, $report, $revenue, $period = null, $group_by = nul
         $days = 1;
     } else {
         // For other groupings, use the entire date range
-        $start = new DateTime($report->start_date);
-        $end = new DateTime($report->end_date);
+        $start = new DateTime($report->getStartDate());
+        $end = new DateTime($report->getEndDate());
         $days = $start->diff($end)->days + 1;
     }
     

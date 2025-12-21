@@ -129,17 +129,27 @@ class Amenity {
         return $stmt;
     }
 
+    // Check if name exists
+    public function nameExists() {
+        $query = "SELECT id FROM " . $this->table_name . " WHERE name = :name LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $this->name = htmlspecialchars(strip_tags($this->name));
+        $stmt->bindParam(":name", $this->name);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
+    }
+
     // Get amenities by hotel
     public function getByHotel($hotel_id) {
         $query = "SELECT a.* FROM " . $this->table_name . " a
                  INNER JOIN hotel_amenities ha ON a.id = ha.amenity_id
                  WHERE ha.hotel_id = ?
                  ORDER BY a.name ASC";
-        
+
         $stmt = $this->conn->prepare($query);
         $hotel_id = htmlspecialchars(strip_tags($hotel_id));
         $stmt->bindParam(1, $hotel_id);
-        
+
         $stmt->execute();
         return $stmt;
     }

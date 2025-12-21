@@ -6,9 +6,9 @@ header("Access-Control-Allow-Methods: PUT");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include_once '../config/database.php';
-include_once '../classes/User.php';
-include_once '../helpers/jwt_helper.php';
+include_once '../../config/database.php';
+include_once '../../classes/User.php';
+include_once '../../helpers/jwt_helper.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -26,7 +26,7 @@ try {
     $jwtHandler = new JwtHandler($db);
     $payload = $jwtHandler->getTokenPayload($jwt);
     
-    if ($payload['role'] !== 'Admin') {
+    if ($payload['role'] !== 'admin') {
         http_response_code(403);
         echo json_encode(["message" => "Insufficient permissions."]);
         exit();
@@ -38,7 +38,7 @@ try {
         exit();
     }
 
-    if (!in_array($data->new_role, ['Admin', 'Manager', 'Customer'])) {
+    if (!in_array(strtolower($data->new_role), ['admin', 'manager', 'customer'])) {
         http_response_code(400);
         echo json_encode(["message" => "Invalid role."]);
         exit();

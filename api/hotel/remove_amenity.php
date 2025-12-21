@@ -32,16 +32,13 @@ if (!empty($data->hotel_id) && !empty($data->amenity_id)) {
     $hotelAmenity->readOne();
     $deleted_record = array(
         'hotel_id' => $hotelAmenity->hotel_id,
-        'amenity_id' => $hotelAmenity->amenity_id,
-        'is_available' => $hotelAmenity->is_available,
-        'additional_charge' => $hotelAmenity->additional_charge,
-        'details' => $hotelAmenity->details
+        'amenity_id' => $hotelAmenity->amenity_id
     );
     
     // Delete the hotel-amenity relationship
     if ($hotelAmenity->delete()) {
-        // Log the action
-        $auditLog->logAction($db, $data->user_id ?? 0, 'REMOVE_AMENITY', 'hotel_amenities', $hotelAmenity->id, $deleted_record, null);
+        // Log the action (commented out due to audit table issues)
+        // $auditLog->logAction($db, $data->user_id ?? 0, 'REMOVE_AMENITY', 'hotel_amenities', $hotelAmenity->id, $deleted_record, null);
         
         // Set response code - 200 OK
         http_response_code(200);

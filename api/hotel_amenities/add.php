@@ -9,6 +9,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // Include database and object files
 include_once '../../config/database.php';
 include_once '../../models/HotelAmenity.php';
+include_once '../../models/Amenity.php';
 include_once '../../models/AuditLog.php';
 
 // Get database connection
@@ -17,6 +18,7 @@ $db = $database->getConnection();
 
 // Initialize objects
 $hotelAmenity = new HotelAmenity($db);
+$amenity = new Amenity($db);
 $auditLog = new AuditLog($db);
 
 // Get posted data
@@ -24,12 +26,20 @@ $data = json_decode(file_get_contents("php://input"));
 
 // Check if data is not empty
 if (!empty($data->hotel_id) && !empty($data->amenity_id)) {
+    // Check if amenity exists
+    $amenity->id = $data->amenity_id;
+    if (!$amenity->readOne()) {
+        http_response_code(404);
+        echo json_encode(array(
+            "status" => "error",
+            "message" => "Amenity not found."
+        ));
+        exit();
+    }
+
     // Set hotel amenity property values
     $hotelAmenity->hotel_id = $data->hotel_id;
     $hotelAmenity->amenity_id = $data->amenity_id;
-    $hotelAmenity->is_available = $data->is_available ?? 1;
-    $hotelAmenity->additional_charge = $data->additional_charge ?? 0.00;
-    $hotelAmenity->details = $data->details ?? null;
 
     // Check if the amenity is already added to the hotel
     if ($hotelAmenity->exists()) {
@@ -49,9 +59,7 @@ if (!empty($data->hotel_id) && !empty($data->amenity_id)) {
         // Log the action
         $auditLog->logAction($db, $data->user_id ?? 0, 'ADD_AMENITY', 'hotel_amenities', $hotelAmenity->id, null, array(
             'hotel_id' => $hotelAmenity->hotel_id,
-            'amenity_id' => $hotelAmenity->amenity_id,
-            'is_available' => $hotelAmenity->is_available,
-            'additional_charge' => $hotelAmenity->additional_charge
+            'amenity_id' => $hotelAmenity->amenity_id
         ));
         
         // Set response code - 201 created

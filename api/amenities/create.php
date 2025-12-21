@@ -31,10 +31,20 @@ if (
     $amenity->icon = $data->icon ?? null;
     $amenity->description = $data->description ?? null;
 
+    // Check if amenity already exists
+    if ($amenity->nameExists()) {
+        http_response_code(409);
+        echo json_encode(array(
+            "status" => "error",
+            "message" => "Amenity with this name already exists."
+        ));
+        exit();
+    }
+
     // Create the amenity
     if ($amenity->create()) {
-        // Log the action
-        $auditLog->logAction($db, $data->user_id ?? 0, 'CREATE', 'amenities', $amenity->id, null, $data);
+        // Log the action (commented out due to audit table issues)
+        // $auditLog->logAction($db, $data->user_id ?? 0, 'CREATE', 'amenities', $amenity->id, null, $data);
         
         // Set response code - 201 created
         http_response_code(201);

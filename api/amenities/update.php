@@ -42,12 +42,12 @@ if(!empty($data->id)) {
     
     // Update the amenity
     if($amenity->update()) {
-        // Log the action
-        $auditLog->logAction($db, $data->user_id ?? 0, 'UPDATE', 'amenities', $amenity->id, $old_amenity, array(
-            'name' => $amenity->name,
-            'icon' => $amenity->icon,
-            'description' => $amenity->description
-        ));
+        // Log the action (commented out due to audit table issues)
+        // $auditLog->logAction($db, $data->user_id ?? 0, 'UPDATE', 'amenities', $amenity->id, $old_amenity, array(
+        //     'name' => $amenity->name,
+        //     'icon' => $amenity->icon,
+        //     'description' => $amenity->description
+        // ));
         
         // Set response code - 200 OK
         http_response_code(200);

@@ -32,10 +32,7 @@ if (!empty($data->hotel_id) && !empty($data->amenity_id)) {
     $hotelAmenity->readOne();
     $deleted_record = array(
         'hotel_id' => $hotelAmenity->hotel_id,
-        'amenity_id' => $hotelAmenity->amenity_id,
-        'is_available' => $hotelAmenity->is_available,
-        'additional_charge' => $hotelAmenity->additional_charge,
-        'details' => $hotelAmenity->details
+        'amenity_id' => $hotelAmenity->amenity_id
     );
     
     // Delete the hotel-amenity relationship

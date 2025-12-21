@@ -11,6 +11,18 @@ class ReportGenerator {
         $this->end_date = $end_date ?: date('Y-m-t'); // Default to end of current month
         $this->hotel_id = $hotel_id;
     }
+
+    public function getStartDate() {
+        return $this->start_date;
+    }
+
+    public function getEndDate() {
+        return $this->end_date;
+    }
+
+    public function getHotelId() {
+        return $this->hotel_id;
+    }
     
     protected function validateDates() {
         $start = new DateTime($this->start_date);

@@ -216,6 +216,51 @@ class User {
         return false;
     }
 
+    public function updateRole($new_role) {
+        // First, check if user exists
+        if (!$this->getById($this->id)) {
+            throw new Exception('User not found');
+        }
+
+        // Validate role
+        $valid_roles = ['admin', 'manager', 'customer'];
+        $new_role = strtolower($new_role);
+        if (!in_array($new_role, $valid_roles)) {
+            throw new Exception('Invalid role specified. Must be one of: ' . implode(', ', $valid_roles));
+        }
+
+        // Handle professional details based on role
+        $professional_details = null;
+        if ($new_role === 'manager') {
+            // For manager, professional details are required
+            if (empty($this->professional_details)) {
+                throw new Exception('Professional details are required for manager role');
+            }
+            $professional_details = $this->professional_details; // Keep existing
+        } else {
+            // For other roles, set professional_details to null
+            $professional_details = null;
+        }
+
+        $query = "UPDATE " . $this->table_name . " SET
+                  role = :role,
+                  professional_details = :professional_details,
+                  updated_at = NOW()
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':role', $new_role);
+        $stmt->bindParam(':professional_details', $professional_details);
+        $stmt->bindParam(':id', $this->id);
+
+        if($stmt->execute()) {
+            return $stmt->rowCount() > 0;
+        }
+
+        $error = $stmt->errorInfo();
+        throw new Exception('Database error: ' . ($error[2] ?? 'Unknown error'));
+    }
+
     public function update() {
         $query = "UPDATE " . $this->table_name . " SET
                   email = :email,
