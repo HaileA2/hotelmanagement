@@ -81,28 +81,42 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Handle check availability form submission
-function handleCheckAvailability(e) {
-  e.preventDefault();
-  
-  const formData = {
-    checkIn: $('#dateRange').data('daterangepicker').startDate.format('YYYY-MM-DD'),
-    checkOut: $('#dateRange').data('daterangepicker').endDate.format('YYYY-MM-DD'),
-    adults: adultsSelect ? adultsSelect.value : 2,
-    children: childrenSelect ? childrenSelect.value : 0,
-    promoCode: promoCodeInput ? promoCodeInput.value : ''
-  };
-  
-  console.log('Checking availability:', formData);
-  
-  // In a real app, this would be an API call to check room availability
-  // For now, just show a success message
-  showAlert('success', 'Rooms are available for your selected dates!');
-  
-  // Scroll to rooms section
-  const roomsSection = document.querySelector('.rooms-section');
-  if (roomsSection) {
-    roomsSection.scrollIntoView({ behavior: 'smooth' });
-  }
+async function handleCheckAvailability(e) {
+   e.preventDefault();
+
+   const formData = {
+       checkIn: $('#dateRange').data('daterangepicker').startDate.format('YYYY-MM-DD'),
+       checkOut: $('#dateRange').data('daterangepicker').endDate.format('YYYY-MM-DD'),
+       adults: adultsSelect ? adultsSelect.value : 2,
+       children: childrenSelect ? childrenSelect.value : 0,
+       promoCode: promoCodeInput ? promoCodeInput.value : ''
+   };
+
+   console.log('Checking availability:', formData);
+
+   try {
+       // Import API service
+       const { apiService } = await import('../js/services/api.service.js');
+
+       // In a real app, this would call a room availability API
+       // For now, simulate the check
+       showAlert('success', 'Checking room availability...');
+
+       // Simulate API delay
+       setTimeout(() => {
+           showAlert('success', 'Rooms are available for your selected dates!');
+
+           // Scroll to rooms section
+           const roomsSection = document.querySelector('.rooms-section');
+           if (roomsSection) {
+               roomsSection.scrollIntoView({ behavior: 'smooth' });
+           }
+       }, 1000);
+
+   } catch (error) {
+       console.error('Error checking availability:', error);
+       showAlert('error', 'Failed to check availability. Please try again.');
+   }
 }
 
 // Handle review form submission

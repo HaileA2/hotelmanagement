@@ -136,6 +136,27 @@ body {
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--primary);
-  border-color: var(--primary);
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+#userMenu {
+    display: none;
+}
+
+#sortBy {
+    width: auto;
+}
+
+#mapView {
+    display: none;
+    height: 400px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+
+#mapView p {
+    text-align: center;
+    line-height: 400px;
+    margin: 0;
 }

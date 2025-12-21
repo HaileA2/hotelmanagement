@@ -1,473 +1,74 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - HotelMS</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Base Styles */
-        :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --error: #EF4444;
-            --success: #10B981;
-            --gray-50: #F9FAFB;
-            --gray-100: #F3F4F6;
-            --gray-200: #E5E7EB;
-            --gray-700: #374151;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            line-height: 1.5;
-            color: #1F2937;
-        }
-
-        /* Card */
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 1rem;
-            box-shadow: var(--shadow-lg);
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 28rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #4B5563;
-            margin-bottom: 0.5rem;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 3rem;
-            font-size: 0.9375rem;
-            border: 1px solid #E5E7EB;
-            border-radius: 0.75rem;
-            transition: all 0.2s ease;
-            background-color: #F9FAFB;
-            color: #111827;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-            background-color: #FFFFFF;
-        }
-
-        .input-field::placeholder {
-            color: #9CA3AF;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9CA3AF;
-            transition: color 0.2s ease;
-        }
-
-        .input-field:focus+.input-icon {
-            color: var(--primary);
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 0.875rem 1.5rem;
-            font-weight: 500;
-            font-size: 0.9375rem;
-            color: white;
-            background-color: var(--primary);
-            border: none;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-
-        .btn:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        /* Error States */
-        .error {
-            display: none;
-            font-size: 0.75rem;
-            color: var(--error);
-            margin-top: 0.5rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .error.show {
-            display: block;
-        }
-
-        .input-error {
-            border-color: var(--error) !important;
-        }
-
-        .input-error+.input-icon {
-            color: var(--error);
-        }
-
-        /* Logo & Header */
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: linear-gradient(135deg, var(--primary) 0%, #6366F1 100%);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2), 0 2px 4px -1px rgba(79, 70, 229, 0.1);
-        }
-
-        .logo-icon i {
-            font-size: 1.25rem;
-            color: white;
-        }
-
-        .title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #111827;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            font-size: 0.9375rem;
-            color: #6B7280;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        /* Form Footer */
-        .form-footer {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-size: 0.875rem;
-            color: #6B7280;
-        }
-
-        .form-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .form-footer a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
-        }
-
-        /* Toggle Password */
-        .toggle-password {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9CA3AF;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .toggle-password:hover {
-            color: var(--primary);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 640px) {
-            .card {
-                padding: 1.5rem;
-            }
-
-            .title {
-                font-size: 1.25rem;
-            }
-
-            .subtitle {
-                font-size: 0.875rem;
-            }
-        }
-
-        /* Loading State */
-        .btn-loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .btn-loading:after {
-            content: '';
-            position: absolute;
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-            right: 1rem;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
+    <title>Login - HotelHub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link href="assets/css/style.css" rel="stylesheet">
 </head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-hotel fa-lg"></i>
+                            </div>
+                            <h2 class="card-title mt-3">Welcome Back</h2>
+                            <p class="text-muted">Sign in to your account</p>
+                        </div>
 
-<body class="bg-gray-50">
-    <div class="card">
-        <div id="error-message" class="error-message" style="display: none;"></div>
-        <div class="text-center mb-8">
-            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-hotel text-white text-xl"></i>
+                        <div id="loginAlert" class="alert alert-danger" style="display: none;" role="alert"></div>
+
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Toggle password visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">Remember me</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3" id="loginBtn">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" style="display: none;"></span>
+                                Sign In
+                            </button>
+
+                            <div class="text-center">
+                                <p class="mb-0">Don't have an account? <a href="register.html">Sign up</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <h1 class="text-2xl font-bold text-gray-900">Welcome back</h1>
-            <p class="text-gray-500 mt-1">Sign in to your account</p>
         </div>
-
-        <form id="loginForm" class="space-y-6" onsubmit="handleLogin(event)" novalidate>
-            <!-- Error Message -->
-            <div id="loginError" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                <span id="errorMessage"></span>
-            </div>
-
-            <!-- Email Field -->
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-envelope text-gray-400"></i>
-                    </div>
-                    <input id="email" name="email" type="email" required class="pl-10 input-field"
-                        placeholder="you@example.com">
-                </div>
-                <p class="error" id="email_error"></p>
-            </div>
-
-            <!-- Password Field -->
-            <div>
-                <div class="flex justify-between items-center mb-1">
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <a href="#" class="text-sm text-blue-600 hover:text-blue-500">
-                        Forgot?
-                    </a>
-                </div>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-lock text-gray-400"></i>
-                    </div>
-                    <input id="password" name="password" type="password" required class="pl-10 pr-10 input-field"
-                        placeholder="••••••••">
-                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" id="togglePassword">
-                        <i class="far fa-eye text-gray-400 hover:text-gray-600" id="passwordIcon"></i>
-                    </button>
-                </div>
-                <p class="error" id="password_error"></p>
-            </div>
-
-            <!-- Remember Me -->
-            <div class="flex items-center">
-                <input id="remember-me" name="remember" type="checkbox"
-                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <label for="remember-me" class="ml-2 block text-sm text-gray-600">
-                    Remember me
-                </label>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn-primary w-full" id="loginButton">
-                <span id="loginText">Sign in</span>
-                <span id="loginSpinner" class="hidden">
-                    <i class="fas fa-spinner fa-spin"></i> Signing in...
-                </span>
-            </button>
-
-            <!-- Sign Up Link -->
-            <p class="text-center text-sm text-gray-500 mt-4">
-                Don't have an account?
-                <a href="register.html" class="text-blue-600 hover:text-blue-500 font-medium">
-                    Sign up
-                </a>
-            </p>
-        </form>
     </div>
 
-    <script type="module" src="js/main.js"></script>
-    <script type="module">
-        import { authService } from './js/services/auth.service.js';
-        
-        // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-
-        // Handle form submission
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            // Get form elements
-            const form = event.target;
-            const email = form.email.value.trim();
-            const password = form.password.value;
-            const errorElement = document.getElementById('loginError');
-            const errorMessage = document.getElementById('errorMessage');
-            const loginButton = document.getElementById('loginButton');
-            const loginText = document.getElementById('loginText');
-            const loginSpinner = document.getElementById('loginSpinner');
-            
-            // Reset error state
-            errorElement.classList.add('hidden');
-            
-            // Validate inputs
-            if (!email || !password) {
-                showError('Please enter both email and password');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showError('Please enter a valid email address');
-                return;
-            }
-            
-            // Update UI for loading state
-            loginButton.disabled = true;
-            loginText.style.display = 'none';
-            loginSpinner.classList.remove('hidden');
-            
-            try {
-                // Attempt login
-                await authService.login(email, password);
-                
-                // Redirect on success
-                window.location.href = 'dashboard.html';
-            } catch (error) {
-                // Show error message
-                showError(error.message || 'Login failed. Please check your credentials.');
-            } finally {
-                // Reset button state
-                loginButton.disabled = false;
-                loginText.style.display = 'inline';
-                loginSpinner.classList.add('hidden');
-            }
-        }
-        
-        function showError(message) {
-            const errorElement = document.getElementById('loginError');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            errorMessage.textContent = message;
-            errorElement.classList.remove('hidden');
-            
-            // Scroll to error message
-            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        
-        function isValidEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(String(email).toLowerCase());
-        }
-        
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Redirect if already logged in
-            if (authService.isAuthenticated()) {
-                window.location.href = 'dashboard.html';
-            }
-            
-            // Add form submit handler
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
-            
-            // Focus email field on page load
-            document.getElementById('email').focus();
-        });
-    </script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="assets/js/login.js"></script>
 </body>
-
 </html>

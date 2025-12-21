@@ -39,8 +39,6 @@ if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
         "message" => "Invalid authorization token format. Use: Bearer <token>"
     ]);
     exit();
-    echo json_encode(["message" => "Invalid authorization token format. Use: Bearer <token>"]);
-    exit();
 }
 
 $token = $matches[1];

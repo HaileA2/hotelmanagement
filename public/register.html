@@ -1,398 +1,101 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - HotelMS</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --error: #EF4444;
-            --success: #10B981;
-            --gray-50: #F9FAFB;
-            --gray-100: #F3F4F6;
-            --gray-200: #E5E7EB;
-            --gray-700: #374151;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            line-height: 1.5;
-            color: #1F2937;
-        }
-
-        .card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
-            width: 100%;
-            max-width: 32rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #D1D5DB;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .error-message {
-            color: var(--error);
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-
-        .success-message {
-            background-color: #ECFDF5;
-            color: #065F46;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-group .form-input {
-            padding-right: 2.5rem;
-        }
-
-        .input-group-append {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #6B7280;
-        }
-    </style>
+    <title>Sign Up - HotelHub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link href="assets/css/style.css" rel="stylesheet">
 </head>
-<body class="bg-gray-50">
-    <div class="card">
-        <div class="text-center mb-6">
-            <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-lg mb-4">
-                <i class="fas fa-hotel text-indigo-600 text-xl"></i>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-user-plus fa-lg"></i>
+                            </div>
+                            <h2 class="card-title mt-3">Create Account</h2>
+                            <p class="text-muted">Join HotelHub today</p>
+                        </div>
+
+                        <div id="registerAlert" class="alert alert-danger" style="display: none;" role="alert"></div>
+
+                        <form id="registerForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" placeholder="John" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" placeholder="Doe" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="email" placeholder="john@example.com" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" placeholder="Create a password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Toggle password visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Must be at least 8 characters with one special character</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Account Type</label>
+                                <select class="form-select" id="role" required>
+                                    <option value="customer" selected>Customer</option>
+                                    <option value="manager">Hotel Manager</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="professionalDetails" style="display: none;">
+                                <label for="professional" class="form-label">Professional Details</label>
+                                <textarea class="form-control" id="professional" rows="3" placeholder="Describe your experience, certifications, etc. (Required for managers)"></textarea>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3" id="registerBtn">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" style="display: none;"></span>
+                                Create Account
+                            </button>
+
+                            <div class="text-center">
+                                <p class="mb-0">Already have an account? <a href="login.html">Sign in</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <h1 class="text-2xl font-bold text-gray-900">Create an account</h1>
-            <p class="text-gray-600 mt-1">Join our hotel management system today</p>
         </div>
-
-        <!-- Success Message -->
-        <div id="registerSuccess" class="success-message">
-            <i class="fas fa-check-circle mr-2"></i>
-            <span id="successMessage"></span>
-        </div>
-
-        <!-- Error Message -->
-        <div id="registerError" class="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 hidden">
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            <span id="errorMessage"></span>
-        </div>
-
-        <form id="registerForm" class="space-y-4">
-            <!-- Personal Information -->
-            <div class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                        <input type="text" id="firstName" name="firstName" class="form-input" required>
-                        <div id="firstNameError" class="error-message"></div>
-                    </div>
-                    <div>
-                        <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                        <input type="text" id="lastName" name="lastName" class="form-input" required>
-                        <div id="lastNameError" class="error-message"></div>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="email" name="email" class="form-input" required>
-                    <div id="emailError" class="error-message"></div>
-                </div>
-
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" class="form-input">
-                    <div id="phoneError" class="error-message"></div>
-                </div>
-
-                <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                    <input type="text" id="address" name="address" class="form-input">
-                    <div id="addressError" class="error-message"></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                        <input type="text" id="city" name="city" class="form-input">
-                        <div id="cityError" class="error-message"></div>
-                    </div>
-                    <div>
-                        <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                        <input type="text" id="state" name="state" class="form-input">
-                        <div id="stateError" class="error-message"></div>
-                    </div>
-                    <div>
-                        <label for="postalCode" class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                        <input type="text" id="postalCode" name="postalCode" class="form-input">
-                        <div id="postalCodeError" class="error-message"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Account Information -->
-            <div class="pt-4 space-y-4">
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <div class="input-group">
-                        <input type="password" id="password" name="password" class="form-input" required>
-                        <span class="input-group-append" id="togglePassword">
-                            <i class="far fa-eye"></i>
-                        </span>
-                    </div>
-                    <div id="passwordError" class="error-message"></div>
-                    <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters long</p>
-                </div>
-
-                <div>
-                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                    <div class="input-group">
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required>
-                        <span class="input-group-append" id="toggleConfirmPassword">
-                            <i class="far fa-eye"></i>
-                        </span>
-                    </div>
-                    <div id="confirmPasswordError" class="error-message"></div>
-                </div>
-
-                <div class="flex items-start">
-                    <div class="flex items-center h-5">
-                        <input id="terms" name="terms" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" required>
-                    </div>
-                    <div class="ml-3 text-sm">
-                        <label for="terms" class="font-medium text-gray-700">I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a></label>
-                        <div id="termsError" class="error-message"></div>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="w-full btn btn-primary">
-                Create Account
-            </button>
-
-            <div class="text-center text-sm text-gray-600">
-                Already have an account?
-                <a href="login.html" class="font-medium text-indigo-600 hover:text-indigo-500">Sign in</a>
-            </div>
-        </form>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('registerForm');
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirmPassword');
-            const togglePassword = document.getElementById('togglePassword');
-            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-
-            // Toggle password visibility
-            function setupPasswordToggle(input, toggle) {
-                toggle.addEventListener('click', function() {
-                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-                    input.setAttribute('type', type);
-                    this.querySelector('i').classList.toggle('fa-eye');
-                    this.querySelector('i').classList.toggle('fa-eye-slash');
-                });
-            }
-
-            if (togglePassword && passwordInput) {
-                setupPasswordToggle(passwordInput, togglePassword);
-            }
-
-            if (toggleConfirmPassword && confirmPasswordInput) {
-                setupPasswordToggle(confirmPasswordInput, toggleConfirmPassword);
-            }
-
-            // Form validation
-            if (form) {
-                form.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    // Reset error messages
-                    document.querySelectorAll('.error-message').forEach(el => {
-                        el.style.display = 'none';
-                    });
-
-                    // Get form values
-                    const firstName = document.getElementById('firstName').value.trim();
-                    const lastName = document.getElementById('lastName').value.trim();
-                    const email = document.getElementById('email').value.trim();
-                    const password = passwordInput.value;
-                    const confirmPassword = confirmPasswordInput.value;
-                    const terms = document.getElementById('terms').checked;
-
-                    let isValid = true;
-
-                    // Validate first name
-                    if (!firstName) {
-                        showError('firstNameError', 'First name is required');
-                        isValid = false;
-                    }
-
-                    // Validate last name
-                    if (!lastName) {
-                        showError('lastNameError', 'Last name is required');
-                        isValid = false;
-                    }
-
-                    // Validate email
-                    if (!email) {
-                        showError('emailError', 'Email is required');
-                        isValid = false;
-                    } else if (!isValidEmail(email)) {
-                        showError('emailError', 'Please enter a valid email address');
-                        isValid = false;
-                    }
-
-                    // Validate password
-                    if (!password) {
-                        showError('passwordError', 'Password is required');
-                        isValid = false;
-                    } else if (password.length < 8) {
-                        showError('passwordError', 'Password must be at least 8 characters long');
-                        isValid = false;
-                    }
-
-                    // Validate confirm password
-                    if (password !== confirmPassword) {
-                        showError('confirmPasswordError', 'Passwords do not match');
-                        isValid = false;
-                    }
-
-                    // Validate terms
-                    if (!terms) {
-                        showError('termsError', 'You must accept the terms and conditions');
-                        isValid = false;
-                    }
-
-                    if (isValid) {
-                        try {
-                            // Prepare form data
-                            const formData = {
-                                firstName,
-                                lastName,
-                                email,
-                                password,
-                                phone: document.getElementById('phone').value.trim(),
-                                address: document.getElementById('address').value.trim(),
-                                city: document.getElementById('city').value.trim(),
-                                state: document.getElementById('state').value.trim(),
-                                postalCode: document.getElementById('postalCode').value.trim(),
-                                country: document.getElementById('country').value
-                            };
-
-                            // Call the registration API
-                            const response = await fetch('/hotel-management-system/api/auth/register.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(formData)
-                            });
-
-                            const data = await response.json();
-
-                            if (response.ok) {
-                                // Registration successful
-                                showSuccess('Registration successful! Redirecting to login...');
-                                setTimeout(() => {
-                                    window.location.href = 'login.html';
-                                }, 2000);
-                            } else {
-                                // Handle API errors
-                                showError('registerError', data.message || 'Registration failed. Please try again.');
-                            }
-                        } catch (error) {
-                            console.error('Registration error:', error);
-                            showError('registerError', 'An error occurred. Please try again later.');
-                        }
-                    }
-                });
-            }
-
-            // Helper functions
-            function showError(elementId, message) {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = message;
-                    element.style.display = 'block';
-                    
-                    // Scroll to the first error
-                    if (elementId !== 'registerError') {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    } else {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }
-            }
-
-            function showSuccess(message) {
-                const successElement = document.getElementById('registerSuccess');
-                const successMessage = document.getElementById('successMessage');
-                if (successElement && successMessage) {
-                    successMessage.textContent = message;
-                    successElement.style.display = 'flex';
-                    successElement.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-
-            function isValidEmail(email) {
-                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return re.test(String(email).toLowerCase());
-            }
-        });
-    </script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="assets/js/register.js"></script>
 </body>
 </html>

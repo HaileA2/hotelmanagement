@@ -1,5 +1,10 @@
 RewriteEngine On
 
+# Set correct MIME type for JavaScript modules
+<Files ~ "\.js$">
+    Header set Content-Type "application/javascript"
+</Files>
+
 # If the requested file or directory doesn't exist
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

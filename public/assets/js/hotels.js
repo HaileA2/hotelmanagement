@@ -1,28 +1,33 @@
-// Sample hotel data (in a real app, this would come from an API)
+// Import services
+import { apiService } from '../js/services/api.service.js';
+import { authService } from '../js/services/auth.service.js';
+
+// Sample hotel data (fallback when API is not available)
 const sampleHotels = [
   {
     id: 1,
     name: 'Luxury Grand Hotel',
-    location: 'New York',
-    rating: 4.5,
-    reviewCount: 1243,
-    price: 299,
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
+    location: 'New York, NY',
+    description: 'Experience unparalleled luxury at the Luxury Grand Hotel, located in the heart of New York City.',
     amenities: ['wifi', 'pool', 'restaurant', 'gym', 'parking'],
-    isFavorite: false
+    created_at: '2023-12-01 10:00:00'
   },
   {
     id: 2,
     name: 'Sunset Resort & Spa',
-    location: 'Miami',
-    rating: 4.7,
-    reviewCount: 892,
-    price: 349,
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
+    location: 'Miami, FL',
+    description: 'A tropical paradise with world-class amenities and stunning ocean views.',
     amenities: ['wifi', 'pool', 'spa', 'restaurant', 'beach'],
-    isFavorite: false
+    created_at: '2023-12-02 10:00:00'
   },
-  // Add more sample hotels as needed
+  {
+    id: 3,
+    name: 'Mountain View Lodge',
+    location: 'Aspen, CO',
+    description: 'Cozy mountain retreat with breathtaking views and outdoor activities.',
+    amenities: ['wifi', 'restaurant', 'gym', 'parking', 'ski'],
+    created_at: '2023-12-03 10:00:00'
+  }
 ];
 
 // DOM Elements
@@ -84,41 +89,63 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Load hotels (in a real app, this would be an API call)
-function loadHotels(filters = {}) {
+// Load hotels from API
+async function loadHotels(filters = {}) {
   // Show loading state
   if (hotelsList) {
     showLoading(hotelsList);
   }
 
-  // Simulate API call
-  setTimeout(() => {
-    let filteredHotels = [...sampleHotels];
+  try {
+    // Import API service
+    const { apiService } = await import('../js/services/api.service.js');
 
-    // Apply filters (in a real app, this would be done server-side)
+    // Call API
+    let hotels = [];
+    try {
+        const response = await apiService.getHotels();
+        hotels = response.data || [];
+    } catch (apiError) {
+        console.warn('API not available, using sample data:', apiError);
+        // Fall back to sample data if API fails
+        hotels = sampleHotels;
+    }
+
+    // Apply client-side filters (in production, this should be server-side)
     if (filters.minPrice) {
-      filteredHotels = filteredHotels.filter(hotel => hotel.price >= filters.minPrice);
+      hotels = hotels.filter(hotel => hotel.price >= filters.minPrice);
     }
     if (filters.maxPrice) {
-      filteredHotels = filteredHotels.filter(hotel => hotel.price <= filters.maxPrice);
+      hotels = hotels.filter(hotel => hotel.price <= filters.maxPrice);
     }
     if (filters.amenities && filters.amenities.length > 0) {
-      filteredHotels = filteredHotels.filter(hotel => 
-        filters.amenities.every(amenity => hotel.amenities.includes(amenity))
+      hotels = hotels.filter(hotel =>
+        filters.amenities.every(amenity => hotel.amenities && hotel.amenities.includes(amenity))
       );
     }
     if (filters.rating) {
-      filteredHotels = filteredHotels.filter(hotel => hotel.rating >= filters.rating);
+      hotels = hotels.filter(hotel => hotel.rating >= filters.rating);
     }
 
     // Update results count
     if (resultsCount) {
-      resultsCount.textContent = `${filteredHotels.length} hotels found`;
+      resultsCount.textContent = `${hotels.length} hotels found`;
     }
 
     // Render hotels
-    renderHotels(filteredHotels);
-  }, 500);
+    renderHotels(hotels);
+  } catch (error) {
+    console.error('Error loading hotels:', error);
+    if (hotelsList) {
+      hotelsList.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+          <h4>Error loading hotels</h4>
+          <p class="text-muted">${error.message}</p>
+        </div>
+      `;
+    }
+  }
 }
 
 // Render hotels list
@@ -131,61 +158,68 @@ function renderHotels(hotels) {
         <i class="fas fa-hotel fa-3x text-muted mb-3"></i>
         <h4>No hotels found</h4>
         <p class="text-muted">Try adjusting your search or filters</p>
-        <button class="btn btn-outline-primary mt-2" id="resetFiltersBtn">Reset Filters</button>
+        <button class="btn btn-outline-primary mt-2" onclick="resetFilters()">Reset Filters</button>
       </div>
     `;
     return;
   }
 
-  hotelsList.innerHTML = hotels.map(hotel => `
-    <div class="col-12 mb-4">
-      <div class="card hotel-card">
-        <div class="row g-0">
-          <div class="col-md-4 position-relative">
-            <img src="${hotel.image}" class="img-fluid rounded-start h-100" alt="${hotel.name}" style="object-fit: cover; min-height: 200px;">
-            <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle" 
-                    onclick="toggleFavorite(${hotel.id}, this)">
-              <i class="${hotel.isFavorite ? 'fas' : 'far'} fa-heart text-danger"></i>
-            </button>
-          </div>
-          <div class="col-md-5">
-            <div class="card-body h-100 d-flex flex-column">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <div>
-                  <h5 class="card-title mb-1">${hotel.name}</h5>
-                  <p class="text-muted mb-2">
-                    <i class="fas fa-map-marker-alt text-primary"></i> ${hotel.location}
-                  </p>
-                </div>
-                <div class="text-end">
-                  <div class="rating mb-1">
-                    ${renderRatingStars(hotel.rating)}
+  hotelsList.innerHTML = hotels.map(hotel => {
+    const amenities = Array.isArray(hotel.amenities) ? hotel.amenities : (hotel.amenities ? JSON.parse(hotel.amenities) : []);
+    const rating = hotel.rating || 4.0;
+    const price = hotel.price || 150; // Default price since API doesn't provide it
+    const image = hotel.image || 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
+
+    return `
+      <div class="col-12 mb-4">
+        <div class="card hotel-card">
+          <div class="row g-0">
+            <div class="col-md-4 position-relative">
+              <img src="${image}" class="img-fluid rounded-start h-100" alt="${hotel.name}" style="object-fit: cover; min-height: 200px;">
+              <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle"
+                      onclick="toggleFavorite(${hotel.id}, this)">
+                <i class="far fa-heart text-danger"></i>
+              </button>
+            </div>
+            <div class="col-md-5">
+              <div class="card-body h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h5 class="card-title mb-1">${hotel.name}</h5>
+                    <p class="text-muted mb-2">
+                      <i class="fas fa-map-marker-alt text-primary"></i> ${hotel.location}
+                    </p>
                   </div>
-                  <small class="text-muted">${hotel.reviewCount} reviews</small>
+                  <div class="text-end">
+                    <div class="rating mb-1">
+                      ${renderRatingStars(rating)}
+                    </div>
+                    <small class="text-muted">Rating: ${rating}/5</small>
+                  </div>
+                </div>
+
+                <div class="amenities mb-3">
+                  ${renderAmenities(amenities)}
+                </div>
+
+                <div class="mt-auto">
+                  <a href="hotel-details.html?id=${hotel.id}" class="btn btn-link p-0">View details <i class="fas fa-chevron-right small"></i></a>
                 </div>
               </div>
-              
-              <div class="amenities mb-3">
-                ${renderAmenities(hotel.amenities)}
-              </div>
-              
-              <div class="mt-auto">
-                <a href="hotel-details.html?id=${hotel.id}" class="btn btn-link p-0">View details <i class="fas fa-chevron-right small"></i></a>
-              </div>
             </div>
-          </div>
-          <div class="col-md-3 bg-light p-4 d-flex flex-column">
-            <div class="text-end mb-3">
-              <p class="h4 mb-0">$${hotel.price}</p>
-              <small class="text-muted">per night</small>
-              <p class="text-success small mb-0">Free cancellation</p>
+            <div class="col-md-3 bg-light p-4 d-flex flex-column">
+              <div class="text-end mb-3">
+                <p class="h4 mb-0">$${price}</p>
+                <small class="text-muted">per night</small>
+                <p class="text-success small mb-0">Free cancellation</p>
+              </div>
+              <button onclick="bookHotel(${hotel.id}, '${hotel.name}')" class="btn btn-primary w-100 mt-auto">Book Now</button>
             </div>
-            <a href="booking.html?hotelId=${hotel.id}" class="btn btn-primary w-100 mt-auto">Book Now</a>
           </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // Render rating stars
@@ -289,25 +323,73 @@ function sortHotels() {
 
 // Toggle favorite
 function toggleFavorite(hotelId, button) {
-  const icon = button.querySelector('i');
-  const isFavorite = icon.classList.contains('fas');
-  
-  if (isFavorite) {
-    icon.classList.remove('fas');
-    icon.classList.add('far');
-  } else {
-    icon.classList.remove('far');
-    icon.classList.add('fas');
-    // Add animation
-    button.classList.add('animate__animated', 'animate__heartBeat');
-    setTimeout(() => {
-      button.classList.remove('animate__animated', 'animate__heartBeat');
-    }, 1000);
-  }
-  
-  // In a real app, update the favorite status via API
-  console.log(`Hotel ${hotelId} ${isFavorite ? 'removed from' : 'added to'} favorites`);
+   const icon = button.querySelector('i');
+   const isFavorite = icon.classList.contains('fas');
+
+   if (isFavorite) {
+       icon.classList.remove('fas');
+       icon.classList.add('far');
+   } else {
+       icon.classList.remove('far');
+       icon.classList.add('fas');
+       // Add animation
+       button.classList.add('animate__animated', 'animate__heartBeat');
+       setTimeout(() => {
+           button.classList.remove('animate__animated', 'animate__heartBeat');
+       }, 1000);
+   }
+
+   // In a real app, update the favorite status via API
+   console.log(`Hotel ${hotelId} ${isFavorite ? 'removed from' : 'added to'} favorites`);
 }
+
+// Handle hotel booking
+window.bookHotel = async function(hotelId, hotelName) {
+   if (!authService.isAuthenticated()) {
+       alert('Please login to book a hotel');
+       window.location.href = 'login.html';
+       return;
+   }
+
+   // Show booking modal
+   const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+   document.getElementById('bookingModalLabel').textContent = `Book ${hotelName}`;
+   bookingModal.show();
+
+   // Set minimum dates
+   const today = new Date().toISOString().split('T')[0];
+   document.getElementById('checkIn').min = today;
+   document.getElementById('checkOut').min = today;
+
+   // Handle booking confirmation
+   document.getElementById('confirmBooking').onclick = async function() {
+       const checkIn = document.getElementById('checkIn').value;
+       const checkOut = document.getElementById('checkOut').value;
+       const guests = document.getElementById('guests').value;
+       const specialRequests = document.getElementById('specialRequests').value;
+
+       if (!checkIn || !checkOut) {
+           alert('Please select check-in and check-out dates');
+           return;
+       }
+
+       try {
+           const result = await apiService.createBooking({
+               hotel_id: hotelId,
+               check_in: checkIn,
+               check_out: checkOut,
+               guest_count: guests,
+               special_requests: specialRequests
+           });
+
+           alert('Booking created successfully!');
+           bookingModal.hide();
+           window.location.href = 'bookings.html';
+       } catch (error) {
+           alert('Booking failed: ' + (error.message || 'Unknown error'));
+       }
+   };
+};
 
 // Switch between list and map view
 function switchView(view) {

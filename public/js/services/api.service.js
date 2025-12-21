@@ -56,47 +56,56 @@ class ApiService {
 
     // User endpoints
     async getCurrentUser() {
-        return this.request('/user/me.php');
+        return this.request('/user/profile.php');
     }
 
     async updateProfile(userData) {
         return this.request('/user/update_profile.php', {
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify(userData)
+        });
+    }
+
+    // Hotel endpoints
+    async getHotels() {
+        return this.request('/hotel/list_hotels.php');
+    }
+
+    async createHotel(hotelData) {
+        return this.request('/hotel/create_hotel.php', {
+            method: 'POST',
+            body: JSON.stringify(hotelData)
         });
     }
 
     // Room endpoints
     async getRooms() {
-        return this.request('/room/read.php');
+        return this.request('/room/list_rooms.php');
     }
 
-    async getRoom(id) {
-        return this.request(`/room/read_one.php?id=${id}`);
+    async createRoom(roomData) {
+        return this.request('/room/create_room.php', {
+            method: 'POST',
+            body: JSON.stringify(roomData)
+        });
     }
 
     // Booking endpoints
     async getBookings() {
-        return this.request('/booking/read.php');
+        return this.request('/booking/list_bookings.php');
     }
 
     async createBooking(bookingData) {
-        return this.request('/booking/create.php', {
+        return this.request('/booking/create_booking.php', {
             method: 'POST',
             body: JSON.stringify(bookingData)
         });
     }
 
-    async updateBooking(id, bookingData) {
-        return this.request(`/booking/update.php?id=${id}`, {
+    async cancelBooking(bookingData) {
+        return this.request('/booking/cancel_booking.php', {
             method: 'PUT',
             body: JSON.stringify(bookingData)
-        });
-    }
-
-    async deleteBooking(id) {
-        return this.request(`/booking/delete.php?id=${id}`, {
-            method: 'DELETE'
         });
     }
 }
