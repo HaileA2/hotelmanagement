@@ -160,3 +160,13 @@ body {
     line-height: 400px;
     margin: 0;
 }
+
+/* Register page styles */
+.register-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.hidden {
+    display: none;
+}
