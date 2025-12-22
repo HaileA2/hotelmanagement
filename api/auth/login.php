@@ -87,7 +87,7 @@ try {
     
     http_response_code(200);
     echo json_encode([
-        "status" => "success",
+        "success" => true,
         "message" => "Login successful.",
         "token" => $token,
         "user" => $user_data
@@ -96,7 +96,7 @@ try {
 } catch (Exception $e) {
     http_response_code(401);
     echo json_encode([
-        "status" => "error",
+        "success" => false,
         "message" => $e->getMessage()
     ]);
 }

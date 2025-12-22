@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,14 +13,17 @@
     <link href="assets/css/style.css" rel="stylesheet">
     <!-- Date Range Picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+    <!-- noUiSlider CSS -->
+    <link rel="stylesheet" href="assets/css/nouislider.min.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.html">HotelHub</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -42,14 +46,16 @@
                     <a href="register.html" class="btn btn-primary" id="registerBtn">Sign Up</a>
                     <div class="dropdown ms-3" id="userMenu" style="display: none;">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown"
-                                data-bs-toggle="dropdown" aria-expanded="false">
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-user me-1"></i>
                             <span id="userName">User</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="dashboard.html">Dashboard</a></li>
                             <li><a class="dropdown-item" href="bookings.html">My Bookings</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">Logout</a></li>
                         </ul>
                     </div>
@@ -77,7 +83,7 @@
                                     <span id="maxPrice">$500+</span>
                                 </div>
                             </div>
-                            
+
                             <h6 class="mb-3">Star Rating</h6>
                             <div class="mb-4">
                                 <div class="form-check">
@@ -111,7 +117,7 @@
                                     </label>
                                 </div>
                             </div>
-                            
+
                             <h6 class="mb-3">Amenities</h6>
                             <div class="mb-3">
                                 <div class="form-check">
@@ -145,13 +151,13 @@
                                     </label>
                                 </div>
                             </div>
-                            
+
                             <button class="btn btn-primary w-100" id="applyFilters">Apply Filters</button>
                             <button class="btn btn-outline-secondary w-100 mt-2" id="resetFilters">Reset All</button>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Hotels List -->
                 <div class="col-lg-9">
                     <!-- Search and Sort -->
@@ -171,7 +177,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <!-- Map Toggle -->
                     <div class="d-flex justify-content-end mb-3">
                         <div class="btn-group" role="group">
@@ -183,12 +189,12 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Map View (Hidden by default) -->
                     <div id="mapView" class="mb-4">
                         <p class="text-muted">Map view will be displayed here</p>
                     </div>
-                    
+
                     <!-- Hotels List -->
                     <div id="hotelsList">
                         <!-- Hotel items will be loaded here by JavaScript -->
@@ -198,7 +204,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Pagination -->
                     <nav aria-label="Hotel pagination" class="mt-4">
                         <ul class="pagination justify-content-center">
@@ -261,6 +267,9 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
+    <!-- noUiSlider JS -->
+    <script src="assets/js/nouislider.min.js"></script>
     <script type="module" src="assets/js/hotels.js"></script>
 </body>
+
 </html>

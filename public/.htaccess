@@ -6,8 +6,10 @@ RewriteEngine On
 </Files>
 
 # If the requested file or directory doesn't exist
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# Exclude .js files from rewrite to allow ES modules to load
+# RewriteCond %{REQUEST_URI} !\.js$
 
 # Redirect all other requests to index.html
-RewriteRule ^(.*)$ index.html [L]
+# RewriteRule ^(.*)$ index.html [L]

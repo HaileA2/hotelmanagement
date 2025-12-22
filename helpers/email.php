@@ -14,10 +14,11 @@
  * @param string $verificationLink The verification link to include in the email
  * @return bool True if the email was sent successfully, false otherwise
  */
-function sendVerificationEmail($email, $name, $verificationLink) {
+function sendVerificationEmail($email, $name, $verificationLink)
+{
     // Email subject
     $subject = 'Verify Your Email Address';
-    
+
     // Email message
     $message = "
     <html>
@@ -74,11 +75,11 @@ function sendVerificationEmail($email, $name, $verificationLink) {
     try {
         // In a production environment, you would use a proper email sending library
         // like PHPMailer, SwiftMailer, or an email service API
-        $result = mail($email, $subject, $message, implode("\r\n", $headers));
-        
+        $result = @mail($email, $subject, $message, implode("\r\n", $headers));
+
         // Log the email sending attempt
         error_log("Verification email sent to {$email}");
-        
+
         return $result;
     } catch (Exception $e) {
         error_log("Failed to send verification email to {$email}: " . $e->getMessage());
@@ -94,7 +95,8 @@ function sendVerificationEmail($email, $name, $verificationLink) {
  * @param string $resetLink The password reset link
  * @return bool True if the email was sent successfully, false otherwise
  */
-function sendPasswordResetEmail($email, $name, $resetLink) {
+function sendPasswordResetEmail($email, $name, $resetLink)
+{
     // Similar implementation to sendVerificationEmail
     // ...
     return true;
@@ -108,7 +110,8 @@ function sendPasswordResetEmail($email, $name, $resetLink) {
  * @param array $bookingDetails Details of the booking
  * @return bool True if the email was sent successfully, false otherwise
  */
-function sendBookingConfirmationEmail($email, $name, $bookingDetails) {
+function sendBookingConfirmationEmail($email, $name, $bookingDetails)
+{
     // Implementation for booking confirmation email
     // ...
     return true;
@@ -122,7 +125,8 @@ function sendBookingConfirmationEmail($email, $name, $bookingDetails) {
  * @param string $message Email message
  * @return bool True if the email was sent successfully, false otherwise
  */
-function sendStaffNotification($staffEmail, $subject, $message) {
+function sendStaffNotification($staffEmail, $subject, $message)
+{
     // Implementation for staff notifications
     // ...
     return true;

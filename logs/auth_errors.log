@@ -21,3 +21,14 @@
 [2025-12-21 17:29:03] Successful login for user: user@example.com
 [2025-12-21 17:36:08] Successful login for user: user@example.com
 [2025-12-21 17:39:06] Successful login for user: userhaile@example.com
+[2025-12-22 18:53:36] Failed login attempt for user hailea536@gmial.com: Invalid password
+[2025-12-22 18:54:59] Failed login attempt for user hailea536@gmial.com: Invalid password
+[2025-12-22 18:56:21] Failed login attempt for user hailea536@gmial.com: Invalid password
+[2025-12-22 19:00:25] Login attempt with non-existent email: userhaile@example.com
+[2025-12-22 19:00:33] Login attempt with non-existent email: userhaile@example.com
+[2025-12-22 19:01:46] Failed login attempt for user hailea536@gmial.com: Invalid password
+[2025-12-22 19:01:49] Failed login attempt for user hailea536@gmial.com: Invalid password
+[2025-12-22 19:01:50] Failed login attempt for user hailea536@gmial.com: Invalid password
+[2025-12-22 20:37:39] Successful login for user: kalab@gmail.com
+[2025-12-22 20:49:21] Successful login for user: habbib@gmail.com
+[2025-12-22 20:52:00] Successful login for user: userhaile@example.com

@@ -652,7 +652,7 @@
               "raw": "{\"name\":\"Spa Treatment\",\"description\":\"Relaxing massage\",\"price\":100.00,\"duration_minutes\":60,\"is_available\":true}"
             },
             "url": {
-              "raw": "{{base_url}}/api/service/create.php",
+              "raw": "{{base_url}}/api/room_service/create.php",
               "host": ["{{base_url}}"],
               "path": ["api", "service", "create.php"]
             }
@@ -664,7 +664,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/service/list.php",
+              "raw": "{{base_url}}/api/room_service/list.php",
               "host": ["{{base_url}}"],
               "path": ["api", "service", "list.php"]
             }
@@ -689,7 +689,7 @@
               "raw": "{\"price\":120.00}"
             },
             "url": {
-              "raw": "{{base_url}}/api/service/update.php?id=1",
+              "raw": "{{base_url}}/api/room_service/update.php?id=1",
               "host": ["{{base_url}}"],
               "path": ["api", "service", "update.php"],
               "query": [
@@ -712,7 +712,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/service/delete.php?id=1",
+              "raw": "{{base_url}}/api/room_service/delete.php?id=1",
               "host": ["{{base_url}}"],
               "path": ["api", "service", "delete.php"],
               "query": [

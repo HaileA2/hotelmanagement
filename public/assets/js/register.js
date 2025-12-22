@@ -1,7 +1,7 @@
 // Register page JavaScript
 import { authService } from './services/auth.service.js';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Check if already logged in
     if (authService.isAuthenticated()) {
         window.location.href = 'index.html';
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const professionalDetails = document.getElementById('professionalDetails');
 
     // Toggle password visibility
-    togglePassword.addEventListener('click', function() {
+    togglePassword.addEventListener('click', function () {
         const passwordInput = document.getElementById('password');
         const icon = this.querySelector('i');
         if (passwordInput.type === 'password') {
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Show/hide professional details based on role
-    roleSelect.addEventListener('change', function() {
+    roleSelect.addEventListener('change', function () {
         if (this.value === 'manager') {
             professionalDetails.classList.remove('hidden');
             document.getElementById('professional').required = true;
@@ -42,16 +42,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Handle form submission
-    registerForm.addEventListener('submit', async function(e) {
+    registerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
 
         const firstName = document.getElementById('firstName').value.trim();
         const lastName = document.getElementById('lastName').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const role = document.getElementById('role').value;
-        //const professional = document.getElementById('professional').value.trim();
+        const professional = document.getElementById('professional').value.trim();
         const terms = document.getElementById('terms').checked;
 
         // Validation
@@ -102,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 userData.professional_details = professional;
             }
 
-            await authService.register(userData);
+            const result = await authService.register(userData);
 
             showAlert('Registration successful! Redirecting to login...', 'success');
             setTimeout(() => {

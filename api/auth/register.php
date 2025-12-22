@@ -1,6 +1,7 @@
 <?php
 // Include CORS configuration
-require_once '../../config/cors.php';
+require_once '../config/cors.php';
+header('Content-Type: application/json; charset=UTF-8');
 
 // Include necessary files
 require_once '../../config/database.php';
@@ -10,12 +11,18 @@ require_once '../../helpers/email.php'; // We'll create this next
 // Get posted data
 $data = json_decode(file_get_contents("php://input"));
 
+
+if (!$data) {
+    sendResponse(400, 'Invalid or empty JSON request body');
+}
+
 // Function to send JSON response
-function sendResponse($status, $message, $data = null) {
+function sendResponse($status, $message, $data = null)
+{
     http_response_code($status);
-    $response = ['message' => $message];
+    $response = ['success' => ($status < 400), 'message' => $message];
     if ($data !== null) {
-        $response['data'] = $data;
+        $response = array_merge($response, $data);
     }
     echo json_encode($response);
     exit();
@@ -25,13 +32,13 @@ try {
     // Validate required fields
     $required_fields = ['email', 'password', 'first_name', 'last_name'];
     $missing_fields = [];
-    
+
     foreach ($required_fields as $field) {
         if (empty($data->$field)) {
             $missing_fields[] = $field;
         }
     }
-    
+
     if (!empty($missing_fields)) {
         sendResponse(400, 'Missing required fields: ' . implode(', ', $missing_fields));
     }
@@ -51,7 +58,7 @@ try {
 
     // Set default role to 'customer' if not provided
     $data->role = isset($data->role) ? strtolower($data->role) : 'customer';
-    
+
     // Validate role
     $valid_roles = ['admin', 'manager', 'customer'];
     if (!in_array($data->role, $valid_roles)) {
@@ -66,11 +73,11 @@ try {
     // Initialize database connection
     $database = new Database();
     $db = $database->getConnection();
-    
+
     // Check if email already exists
     $user = new User($db);
     $user->email = $data->email;
-    
+
     if ($user->emailExists()) {
         sendResponse(400, 'Email already exists.');
     }
@@ -87,7 +94,7 @@ try {
         // Send verification email
         $verification_link = "https://yourdomain.com/api/auth/verify.php?token=" . $user->verification_token;
         $email_sent = sendVerificationEmail($user->email, $user->first_name, $verification_link);
-        
+
         // Prepare user data for response (exclude sensitive data)
         $user_data = [
             'id' => $user->id,
@@ -95,17 +102,17 @@ try {
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'role' => $user->role,
-            'email_verified' => (bool)$user->email_verified
+            'email_verified' => (bool) $user->email_verified
         ];
-        
+
         // Include professional details if present
         if ($user->professional_details) {
             $user_data['professional_details'] = json_decode($user->professional_details);
         }
-        
-        $message = 'User registered successfully' . 
-                  ($email_sent ? '. Verification email sent.' : '. Failed to send verification email.');
-        
+
+        $message = 'User registered successfully' .
+            ($email_sent ? '. Verification email sent.' : '. Failed to send verification email.');
+
         sendResponse(201, $message, ['user' => $user_data]);
     } else {
         sendResponse(500, 'Unable to register user. Please try again.');
@@ -113,7 +120,7 @@ try {
 } catch (Exception $e) {
     // Log the error for debugging
     error_log('Registration error: ' . $e->getMessage());
-    
+
     // Send a generic error message to the client
     sendResponse(500, 'An error occurred during registration. Please try again.');
 }

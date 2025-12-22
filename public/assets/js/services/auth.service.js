@@ -1,6 +1,6 @@
 class AuthService {
     constructor() {
-        this.baseURL = '/api/auth';
+        this.baseURL = '/hotel-management-system/api/auth';
     }
 
     async login(email, password) {
@@ -62,7 +62,12 @@ class AuthService {
 
     getCurrentUser() {
         const user = localStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
+        if (!user) return null;
+        try {
+            return JSON.parse(user);
+        } catch (e) {
+            return JSON.parse(decodeURIComponent(user));
+        }
     }
 
     getToken() {

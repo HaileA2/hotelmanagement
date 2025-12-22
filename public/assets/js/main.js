@@ -14,7 +14,12 @@ function isLoggedIn() {
 // Get user data from localStorage
 function getCurrentUser() {
   const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
+  if (!user) return null;
+  try {
+    return JSON.parse(user);
+  } catch (e) {
+    return JSON.parse(decodeURIComponent(user));
+  }
 }
 
 // Update UI based on authentication state
@@ -24,7 +29,7 @@ function updateAuthUI() {
   const registerBtn = document.getElementById('registerBtn');
   const userMenu = document.getElementById('userMenu');
   const userName = document.getElementById('userName');
-  
+
   if (user) {
     if (loginBtn) loginBtn.style.display = 'none';
     if (registerBtn) registerBtn.style.display = 'none';
@@ -88,11 +93,11 @@ function showError(message, container) {
 }
 
 // Initialize components when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   initDatePickers();
   initTooltips();
   updateAuthUI();
-  
+
   // Add active class to current nav item
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.nav-link').forEach(link => {
@@ -101,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
       link.setAttribute('aria-current', 'page');
     }
   });
-  
+
   // Initialize logout button if it exists
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
@@ -122,19 +127,19 @@ async function fetchData(endpoint, method = 'GET', data = null) {
       'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
     }
   };
-  
+
   if (data && (method === 'POST' || method === 'PUT')) {
     options.body = JSON.stringify(data);
   }
-  
+
   try {
     const response = await fetch(url, options);
     const result = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(result.message || 'Something went wrong');
     }
-    
+
     return result;
   } catch (error) {
     console.error('API Error:', error);

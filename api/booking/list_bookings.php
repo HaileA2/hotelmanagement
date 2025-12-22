@@ -57,10 +57,10 @@ if ($is_admin) {
 $num = $stmt->rowCount();
 
 // Check if any bookings found
-if ($num > 0) {
-    $bookings_arr = [];
-    $bookings_arr["data"] = [];
+$bookings_arr = [];
+$bookings_arr["data"] = [];
 
+if ($num > 0) {
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         extract($row);
 
@@ -90,11 +90,8 @@ if ($num > 0) {
 
         array_push($bookings_arr["data"], $booking_item);
     }
-
-    http_response_code(200);
-    echo json_encode($bookings_arr);
-} else {
-    http_response_code(404);
-    echo json_encode(["message" => "No bookings found."]);
 }
+
+http_response_code(200);
+echo json_encode($bookings_arr);
 ?>
