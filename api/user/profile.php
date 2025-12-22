@@ -52,12 +52,31 @@ try {
         throw new Exception('Invalid token data');
     }
     
-    $user_id = $payload['user_id'];
-    
+    $current_user_id = $payload['user_id'];
+    $current_user_role = $payload['role'] ?? '';
+
+    // Check if requesting another user's profile
+    $requested_user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : null;
+
+    if ($requested_user_id && $requested_user_id !== $current_user_id) {
+        // Check if current user has permission to view other profiles
+        if (!in_array(strtolower($current_user_role), ['admin', 'manager'])) {
+            http_response_code(403);
+            echo json_encode([
+                "status" => "error",
+                "message" => "Insufficient permissions. Admin or Manager access required to view other user profiles."
+            ]);
+            exit();
+        }
+        $user_id = $requested_user_id;
+    } else {
+        $user_id = $current_user_id;
+    }
+
     // Initialize user object
     $user = new User($db);
     $user->id = $user_id;
-    
+
     // Fetch user data
     if ($user->getById($user_id)) {
         $user_data = [

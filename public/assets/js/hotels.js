@@ -1,5 +1,5 @@
 // Import services
-import { apiService } from '../js/services/api.service.js';
+import apiService from '../js/services/apiService.js';
 import { authService } from '../js/services/auth.service.js';
 
 // Sample hotel data (fallback when API is not available)
@@ -98,7 +98,7 @@ async function loadHotels(filters = {}) {
 
   try {
     // Import API service
-    const { apiService } = await import('../js/services/api.service.js');
+    const { default: apiService } = await import('../js/services/apiService.js');
 
     // Call API
     let hotels = [];

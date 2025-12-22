@@ -1,6 +1,6 @@
 // Dashboard page JavaScript
 import { authService } from '../js/services/auth.service.js';
-import { apiService } from '../js/services/api.service.js';
+import apiService from '../js/services/apiService.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Check authentication and role

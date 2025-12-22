@@ -1,4 +1,4 @@
-import { apiService } from './api.service.js';
+import apiService from './apiService.js';
 
 class AuthService {
     constructor() {

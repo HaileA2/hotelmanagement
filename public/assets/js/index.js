@@ -1,5 +1,5 @@
 // Index page JavaScript
-import { apiService } from '../js/services/api.service.js';
+import apiService from '../js/services/apiService.js';
 import { authService } from '../js/services/auth.service.js';
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -96,7 +96,7 @@ async function handleCheckAvailability(e) {
 
    try {
        // Import API service
-       const { apiService } = await import('../js/services/api.service.js');
+       const { default: apiService } = await import('../js/services/apiService.js');
 
        // In a real app, this would call a room availability API
        // For now, simulate the check

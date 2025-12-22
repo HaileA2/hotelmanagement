@@ -142,7 +142,6 @@ function initLoginPage() {
 }
 
 // Initialize Register Page
-// Initialize Register Page
 function initRegisterPage() {
     const registerForm = document.getElementById('registerForm');
     const errorContainer = document.getElementById('errorContainer');
