@@ -1,0 +1,17 @@
+2025-12-23 10:13:58 - Received booking data: {"hotel_id":11,"check_in":"2025-12-24","check_out":"2025-12-25","guest_count":"1","special_requests":"hhh"}
+2025-12-23 10:13:58 - Missing fields: room_id, total_price
+2025-12-23 12:51:52 - Received booking data: {"hotel_id":11,"check_in":"2025-12-24","check_out":"2025-12-24","guest_count":"3","special_requests":"haokkahhb"}
+2025-12-23 12:51:52 - Missing fields: room_id, total_price
+2025-12-23 12:57:31 - Received booking data: {"hotel_id":11,"check_in":"2025-12-23","check_out":"2025-12-24","guest_count":"2","special_requests":"gajaj"}
+2025-12-23 12:57:31 - Missing fields: room_id, total_price
+2025-12-23 12:58:09 - Received booking data: {"hotel_id":11,"check_in":"2025-12-23","check_out":"2025-12-24","guest_count":"2","special_requests":"gajaj"}
+2025-12-23 12:58:09 - Missing fields: room_id, total_price
+2025-12-23 12:58:09 - Received booking data: {"hotel_id":11,"check_in":"2025-12-23","check_out":"2025-12-24","guest_count":"2","special_requests":"gajaj"}
+2025-12-23 12:58:09 - Missing fields: room_id, total_price
+2025-12-23 13:02:02 - Received booking data: {"hotel_id":11,"check_in":"2025-12-24","check_out":"2025-12-25","guest_count":"2","special_requests":"gagag"}
+2025-12-23 13:02:02 - Missing fields: room_id
+2025-12-23 13:06:24 - Received booking data: {"hotel_id":11,"check_in":"2025-12-25","check_out":"2025-12-31","guest_count":"1","special_requests":"jjjjj"}
+2025-12-23 13:08:33 - Received booking data: {"hotel_id":11,"check_in":"2025-12-25","check_out":"2025-12-25","guest_count":"1","special_requests":"kkkk"}
+2025-12-23 13:08:33 - Missing fields: room_id
+2025-12-23 15:23:02 - Received booking data: {"hotel_id":11,"check_in":"2025-12-24","check_out":"2025-12-26","guest_count":"1","special_requests":"ggg"}
+2025-12-23 15:23:02 - Missing fields: room_id

@@ -60,9 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
     priceRange.noUiSlider.on('update', function(values, handle) {
       const value = parseInt(values[handle]);
       if (handle) {
-        maxPrice.textContent = value === 500 ? '$500+' : `$${value}`;
+        maxPrice.textContent = value === 500 ? '500+' : `$${value}`;
       } else {
-        minPrice.textContent = `$${value}`;
+        minPrice.textContent = `${value}`;
       }
     });
   }
@@ -83,9 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
     sortBy.addEventListener('change', sortHotels);
   }
 
-  if (listViewBtn && mapViewBtn) {
+  if (listViewBtn) {
     listViewBtn.addEventListener('click', () => switchView('list'));
-    mapViewBtn.addEventListener('click', () => switchView('map'));
   }
 });
 
