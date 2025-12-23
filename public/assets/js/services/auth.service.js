@@ -1,6 +1,6 @@
 class AuthService {
     constructor() {
-        this.baseURL = '/hotel-management-system/api/auth';
+        this.baseURL = '/hotelmanagement/api/auth';
     }
 
     async login(email, password) {

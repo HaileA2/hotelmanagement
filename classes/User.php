@@ -176,17 +176,33 @@ class User {
         return false;
     }
 
-    public function read() {
-        $query = "SELECT id, email, first_name, last_name, role, professional_details, 
-                         email_verified, created_at, updated_at 
-                 FROM " . $this->table_name . " 
-                 ORDER BY created_at DESC";
+public function readAll() {
+    $query = "SELECT id, first_name, last_name, email, role, created_at 
+              FROM " . $this->table_name . " 
+              ORDER BY created_at DESC";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    
+    return $stmt;
+}
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        
-        return $stmt;
-    }
+public function read() {
+    // List only the columns that actually exist in your database
+    $query = "SELECT 
+                id, 
+                first_name, 
+                last_name, 
+                email, 
+                role, 
+                created_at 
+              FROM " . $this->table_name . " 
+              ORDER BY created_at DESC";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    return $stmt;
+}
 
     public function getById($id) {
         $query = "SELECT id, email, first_name, last_name, role, professional_details,

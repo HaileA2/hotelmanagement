@@ -1,17 +1,17 @@
 class ApiService {
     constructor() {
-        this.baseURL = '/hotel-management-system';
+        // Ensure this matches your actual XAMPP folder name
+        this.baseURL = '/hotelmanagement';
     }
 
+    // --- INTERNAL HELPERS (The "Engine") ---
     async get(url, params = {}) {
         const queryString = new URLSearchParams(params).toString();
         const fullUrl = queryString ? `${this.baseURL}${url}?${queryString}` : `${this.baseURL}${url}`;
-
         const response = await fetch(fullUrl, {
             method: 'GET',
             headers: this.getHeaders(),
         });
-
         return this.handleResponse(response);
     }
 
@@ -21,7 +21,6 @@ class ApiService {
             headers: this.getHeaders(),
             body: JSON.stringify(data),
         });
-
         return this.handleResponse(response);
     }
 
@@ -31,7 +30,6 @@ class ApiService {
             headers: this.getHeaders(),
             body: JSON.stringify(data),
         });
-
         return this.handleResponse(response);
     }
 
@@ -40,41 +38,54 @@ class ApiService {
             method: 'DELETE',
             headers: this.getHeaders(),
         });
-
         return this.handleResponse(response);
     }
 
     getHeaders() {
-        const headers = {
-            'Content-Type': 'application/json',
-        };
-
         const token = localStorage.getItem('token');
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        return headers;
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+        };
     }
 
     async handleResponse(response) {
+        const data = await response.json();
         if (!response.ok) {
-            const error = await response.text();
-            throw new Error(error || 'API request failed');
+            throw new Error(data.message || 'API request failed');
         }
-
-        return response.json();
+        return data;
     }
 
-    // Specific methods if needed
-    async getCurrentUser() {
-        return this.get('/api/user/profile.php');
+    // --- REFACTORED API METHODS (Using the helpers above) ---
+    
+    // ROOMS
+    async getRooms(hotelId = null) {
+        return this.get('/api/room/list_rooms.php', hotelId ? { hotel_id: hotelId } : {});
     }
 
+    async addRoom(roomData) {
+        return this.post('/api/room/create_room.php', roomData);
+    }
+
+    async updateRoom(roomId, roomData) {
+        return this.put(`/api/room/update_room.php?id=${roomId}`, roomData);
+    }
+
+    async deleteRoom(roomId) {
+        return this.delete(`/api/room/delete_room.php?id=${roomId}`);
+    }
+
+    // HOTELS
     async getHotels(params = {}) {
         return this.get('/api/hotel/list_hotels.php', params);
     }
 
+    async getHotelDetails(hotelId) {
+        return this.get('/api/hotel/hotel_details.php', { hotel_id: hotelId });
+    }
+
+    // BOOKINGS
     async getBookings() {
         return this.get('/api/booking/list_bookings.php');
     }
@@ -83,8 +94,9 @@ class ApiService {
         return this.post('/api/booking/create_booking.php', data);
     }
 
-    async cancelBooking(data) {
-        return this.post('/api/booking/cancel_booking.php', data);
+    // USER
+    async getCurrentUserProfile() {
+        return this.get('/api/user/profile.php');
     }
 }
 

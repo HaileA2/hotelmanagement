@@ -1,4 +1,4 @@
-// Dashboard page JavaScript
+// public/assets/js/dashboard.js
 import { authService } from '../js/services/auth.service.js';
 import apiService from '../js/services/apiService.js';
 
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const user = authService.getCurrentUser();
-    if (user.role !== 'Admin' && user.role !== 'Manager') {
+    if (user.role !== 'admin' && user.role !== 'manager') {
         window.location.href = 'index.html';
         return;
     }

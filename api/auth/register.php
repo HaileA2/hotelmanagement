@@ -1,4 +1,6 @@
 <?php
+
+/** api/auth/register.php */
 // Include CORS configuration
 require_once '../config/cors.php';
 header('Content-Type: application/json; charset=UTF-8');

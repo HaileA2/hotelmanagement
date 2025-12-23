@@ -1,4 +1,4 @@
-// models/User.php (to be created)
+<?php
 class User {
     private $conn;
     private $table_name = "users";
@@ -38,5 +38,16 @@ class User {
     public static function getAllUsers($db, $role = null) {
         // Implementation for getting all users with optional role filter
     }
+
+public function readAll() {
+    $query = "SELECT id, first_name, last_name, email, role, created_at 
+              FROM " . $this->table_name . " 
+              ORDER BY created_at DESC";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    
+    return $stmt;
 }
-```__
+}
+

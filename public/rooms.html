@@ -58,27 +58,23 @@
     <!-- Main Content -->
     <main class="py-5">
         <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="h2 mb-0">Room Management</h1>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roomModal">
-                            <i class="fas fa-plus me-2"></i>Add Room
-                        </button>
-                    </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2 mb-0">Room Management</h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roomModal">
+                    <i class="fas fa-plus me-2"></i>Add Room
+                </button>
+            </div>
 
-                    <!-- Alert for messages -->
-                    <div id="roomsAlert" class="alert" style="display: none;" role="alert"></div>
+            <!-- Alert for messages -->
+            <div id="roomsAlert" class="alert" style="display: none;" role="alert"></div>
 
-                    <!-- Rooms List -->
-                    <div id="roomsContainer">
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2 text-muted">Loading rooms...</p>
-                        </div>
+            <!-- Rooms Table Container -->
+            <div id="roomsContainer" class="table-responsive">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
+                    <p class="mt-2 text-muted">Loading rooms...</p>
                 </div>
             </div>
         </div>
@@ -102,6 +98,10 @@
                             </select>
                         </div>
                         <div class="mb-3">
+                            <label for="roomNumber" class="form-label">Room Number</label>
+                            <input type="text" class="form-control" id="roomNumber">
+                        </div>
+                        <div class="mb-3">
                             <label for="roomType" class="form-label">Room Type</label>
                             <select class="form-select" id="roomType" required>
                                 <option value="Single">Single</option>
@@ -115,7 +115,7 @@
                             <input type="number" class="form-control" id="roomPrice" step="0.01" min="0" required>
                         </div>
                         <div class="mb-3">
-                            <label for="maxOccupancy" class="form-label">Max Occupancy</label>
+                            <label for="maxOccupancy" class="form-label">Capacity</label>
                             <input type="number" class="form-control" id="maxOccupancy" min="1" max="10" required>
                         </div>
                         <div class="mb-3">
@@ -138,10 +138,8 @@
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="text-center">
-                <p class="mb-0">&copy; 2024 HotelHub Admin Panel. All rights reserved.</p>
-            </div>
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 HotelHub Admin Panel. All rights reserved.</p>
         </div>
     </footer>
 

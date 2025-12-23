@@ -1,4 +1,4 @@
-// Login page JavaScript
+// public/assets/js/login.js
 import { authService } from '../js/services/auth.service.js';
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book a Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <h2>Book a Room</h2>
+
+  <form id="bookingForm">
+    <label>Hotel ID</label>
+    <input type="number" id="hotel_id" required />
+
+    <label>Room ID</label>
+    <input type="number" id="room_id" required />
+
+    <label>Check-in Date</label>
+    <input type="date" id="check_in" required />
+
+    <label>Check-out Date</label>
+    <input type="date" id="check_out" required />
+
+    <label>Guest Count</label>
+    <input type="number" id="guest_count" min="1" required />
+
+    <label>Special Requests</label>
+    <textarea id="special_requests" placeholder="Optional"></textarea>
+
+    <button type="submit">Book Room</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script src="assets/js/create_booking.js"></script>
+</body>
+</html>

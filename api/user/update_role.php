@@ -1,71 +1,52 @@
 <?php
-// api/user/update_role.php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: PUT");
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 include_once '../../config/database.php';
-include_once '../../classes/User.php';
+include_once '../../models/User.php';
 include_once '../../helpers/jwt_helper.php';
 
 $database = new Database();
 $db = $database->getConnection();
-$jwt = getBearerToken();
+$jwtHelper = new JwtHandler();
 
-if (!$jwt) {
-    http_response_code(401);
-    echo json_encode(["message" => "Access denied."]);
+// 1. Get Token from Header
+$headers = array_change_key_case(getallheaders(), CASE_LOWER);
+$token = isset($headers['authorization']) ? str_replace('Bearer ', '', $headers['authorization']) : null;
+
+// 2. Validate Admin Access
+$payload = $jwtHelper->getTokenPayload($token);
+if (!$payload || strtolower($payload['role']) !== 'admin') {
+    http_response_code(403);
+    echo json_encode(["message" => "Access denied. Only admins can update roles."]);
     exit();
 }
 
+// 3. Get Request Data
 $data = json_decode(file_get_contents("php://input"));
 
-try {
-    $jwtHandler = new JwtHandler($db);
-    $payload = $jwtHandler->getTokenPayload($jwt);
-    
-    if ($payload['role'] !== 'admin') {
-        http_response_code(403);
-        echo json_encode(["message" => "Insufficient permissions."]);
-        exit();
-    }
-
-    if (!isset($data->user_id) || !isset($data->new_role)) {
-        http_response_code(400);
-        echo json_encode(["message" => "User ID and new role are required."]);
-        exit();
-    }
-
-    if (!in_array(strtolower($data->new_role), ['admin', 'manager', 'customer'])) {
-        http_response_code(400);
-        echo json_encode(["message" => "Invalid role."]);
-        exit();
-    }
-
+if (!empty($data->user_id) && !empty($data->role)) {
     $user = new User($db);
     $user->id = $data->user_id;
-    
-    if ($user->updateRole($data->new_role)) {
+    $newRole = strtolower($data->role);
+
+    // Validate allowed roles
+    if (!in_array($newRole, ['customer', 'manager', 'admin'])) {
+        http_response_code(400);
+        echo json_encode(["message" => "Invalid role type."]);
+        exit();
+    }
+
+    if ($user->updateRole($newRole)) {
         http_response_code(200);
-        echo json_encode(["message" => "User role updated successfully."]);
+        echo json_encode(["message" => "User role updated successfully to " . $newRole]);
     } else {
         http_response_code(503);
         echo json_encode(["message" => "Unable to update user role."]);
     }
-} catch (Exception $e) {
-    http_response_code(401);
-    echo json_encode(["message" => "Invalid token"]);
+} else {
+    http_response_code(400);
+    echo json_encode(["message" => "Incomplete data. Provide user_id and role."]);
 }
-
-function getBearerToken() {
-    $headers = getallheaders();
-    if (isset($headers['Authorization'])) {
-        if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
-            return $matches[1];
-        }
-    }
-    return null;
-}
-?>
