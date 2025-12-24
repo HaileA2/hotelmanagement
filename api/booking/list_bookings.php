@@ -73,6 +73,7 @@ if ($num > 0) {
             "checkInDate" => $check_in,
             "checkOutDate" => $check_out,
             "room_price" => $room_price,
+            "total_price" => $total_price,
             "hotel_name" => $hotel_name,
             "room_type" => $room_type,
             "roomNumber" => $room_id, // Using room_id as room number for now

@@ -94,6 +94,14 @@ class ApiService {
         return this.post('/api/booking/create_booking.php', data);
     }
 
+/**
+     * Cancel a specific booking
+     * @param {Object} data - Should contain { booking_id: id }
+     */
+async cancelBooking(data) {
+        return this.post('/api/booking/cancel_booking.php', data);
+    }
+
     // USER
     async getCurrentUserProfile() {
         return this.get('/api/user/profile.php');

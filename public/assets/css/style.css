@@ -170,3 +170,8 @@ body {
 .hidden {
     display: none;
 }
+
+.text-warning { color: #ffc107 !important; }
+.extra-small { font-size: 0.75rem; }
+.hotel-card { transition: transform 0.2s ease-in-out; }
+.hotel-card:hover { transform: translateY(-5px); }

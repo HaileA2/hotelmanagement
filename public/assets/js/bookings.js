@@ -1,34 +1,34 @@
-// Bookings page JavaScript
-import { authService } from '../js/services/auth.service.js';
-import apiService from '../js/services/apiService.js';
+/** assets/js/bookings.js */
+import { authService } from './services/auth.service.js'; // Fixed path
+import apiService from './services/apiService.js';      // Fixed path
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Check authentication
     if (!authService.isAuthenticated()) {
         window.location.href = 'login.html';
         return;
     }
 
-    // Update UI for logged-in user
     updateAuthUI();
-
-    // Load bookings
     loadBookings();
 
-    // Setup logout
-    document.getElementById('logoutBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        authService.logout();
-    });
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            authService.logout();
+        });
+    }
 });
 
 function updateAuthUI() {
     const user = authService.getCurrentUser();
-    if (user) {
+    const userMenu = document.getElementById('userMenu');
+    const userName = document.getElementById('userName');
+    if (user && userMenu && userName) {
         document.getElementById('loginBtn').style.display = 'none';
         document.getElementById('registerBtn').style.display = 'none';
-        document.getElementById('userMenu').style.display = 'block';
-        document.getElementById('userName').textContent = user.first_name || 'User';
+        userMenu.style.display = 'block';
+        userName.textContent = user.first_name || 'User';
     }
 }
 
@@ -37,7 +37,6 @@ async function loadBookings() {
     const emptyState = document.getElementById('emptyState');
 
     try {
-        // Get user bookings
         const response = await apiService.getBookings();
         const bookings = response.data || [];
 
@@ -47,83 +46,69 @@ async function loadBookings() {
             return;
         }
 
-        // Render bookings
+        emptyState.style.display = 'none';
+        container.style.display = 'block';
         container.innerHTML = bookings.map(booking => createBookingCard(booking)).join('');
 
-        // Add event listeners for booking actions
-        document.querySelectorAll('.view-booking').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const bookingId = this.dataset.bookingId;
-                viewBookingDetails(bookingId);
-            });
-        });
-
-        document.querySelectorAll('.cancel-booking').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const bookingId = this.dataset.bookingId;
-                cancelBooking(bookingId);
-            });
+        // Event Delegation for View and Cancel
+        container.addEventListener('click', (e) => {
+            const viewBtn = e.target.closest('.view-booking');
+            const cancelBtn = e.target.closest('.cancel-booking');
+            
+            if (viewBtn) viewBookingDetails(viewBtn.dataset.bookingId);
+            if (cancelBtn) cancelBooking(cancelBtn.dataset.bookingId);
         });
 
     } catch (error) {
         console.error('Error loading bookings:', error);
         showAlert('Failed to load bookings. Please try again.', 'danger');
-        container.innerHTML = `
-            <div class="text-center py-5">
-                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                <h4>Unable to load bookings</h4>
-                <p class="text-muted">Please check your connection and try again.</p>
-                <button class="btn btn-primary mt-3" onclick="loadBookings()">Retry</button>
-            </div>
-        `;
     }
 }
 
 function createBookingCard(booking) {
     const statusClass = getStatusClass(booking.status);
-    const statusText = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
-
+    // Note: API returns 'checkInDate' and 'checkOutDate' based on your list_bookings.php item mapping
     return `
-        <div class="card mb-4 shadow-sm">
+        <div class="card mb-4 shadow-sm border-0">
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h5 class="card-title mb-2">${booking.hotel_name || 'Hotel Name'}</h5>
-                        <p class="card-text text-muted mb-2">
-                            <i class="fas fa-map-marker-alt me-1"></i>
-                            ${booking.hotel_location || 'Location'}
+                        <h5 class="card-title mb-2 text-primary">${booking.hotel_name}</h5>
+                        <p class="card-text text-muted mb-3">
+                            <i class="fas fa-map-marker-alt me-1"></i>${booking.hotel_location || 'Location'}
                         </p>
-                        <div class="row">
+                        <div class="row g-2 mb-3">
                             <div class="col-sm-6">
-                                <small class="text-muted">Check-in</small>
-                                <p class="mb-1"><i class="fas fa-calendar-check me-1"></i>${formatDate(booking.check_in)}</p>
+                                <div class="p-2 border rounded bg-light">
+                                    <small class="text-muted d-block">Check-in</small>
+                                    <strong><i class="fas fa-calendar-check me-2 text-success"></i>${formatDate(booking.checkInDate)}</strong>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <small class="text-muted">Check-out</small>
-                                <p class="mb-1"><i class="fas fa-calendar-times me-1"></i>${formatDate(booking.check_out)}</p>
+                                <div class="p-2 border rounded bg-light">
+                                    <small class="text-muted d-block">Check-out</small>
+                                    <strong><i class="fas fa-calendar-times me-2 text-danger"></i>${formatDate(booking.checkOutDate)}</strong>
+                                </div>
                             </div>
                         </div>
-                        <p class="mb-2">
-                            <i class="fas fa-bed me-1"></i>Room: ${booking.room_type || 'Standard Room'} |
-                            <i class="fas fa-users me-1"></i>Guests: ${booking.guest_count || 1}
+                        <p class="mb-0">
+                            <span class="me-3"><i class="fas fa-bed me-1"></i> ${booking.room_type}</span>
+                            <span><i class="fas fa-users me-1"></i> Guests: ${booking.guest_count}</span>
                         </p>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <span class="badge ${statusClass} mb-2">${statusText}</span>
-                        <p class="h5 mb-3">$${booking.total_price || '0.00'}</p>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-outline-primary btn-sm view-booking"
-                                    data-booking-id="${booking.id}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#bookingModal">
-                                <i class="fas fa-eye me-1"></i>View
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0 border-start-md">
+                        <span class="badge ${statusClass} mb-3 p-2 px-3">${booking.status}</span>
+                        <h4 class="mb-3">$${booking.room_price} <small class="text-muted" style="font-size: 0.6em;">/night</small></h4>
+                        <div class="d-grid gap-2 d-md-block">
+                            <button class="btn btn-outline-primary btn-sm view-booking" 
+                                    data-booking-id="${booking.id}" 
+                                    data-bs-toggle="modal" data-bs-target="#bookingModal">
+                                <i class="fas fa-eye me-1"></i> Details
                             </button>
-                            ${booking.status === 'confirmed' || booking.status === 'pending' ?
-                                `<button class="btn btn-outline-danger btn-sm cancel-booking"
-                                        data-booking-id="${booking.id}">
-                                    <i class="fas fa-times me-1"></i>Cancel
-                                </button>` : ''
-                            }
+                            ${(booking.status.toLowerCase() === 'pending' || booking.status.toLowerCase() === 'confirmed') ? 
+                                `<button class="btn btn-outline-danger btn-sm cancel-booking" data-booking-id="${booking.id}">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -133,117 +118,165 @@ function createBookingCard(booking) {
 }
 
 function getStatusClass(status) {
-    switch (status) {
-        case 'confirmed': return 'bg-success';
-        case 'pending': return 'bg-warning text-dark';
-        case 'cancelled': return 'bg-danger';
-        case 'completed': return 'bg-info';
-        default: return 'bg-secondary';
-    }
+    const s = status.toLowerCase();
+    if (s === 'confirmed' || s === 'completed') return 'bg-success';
+    if (s === 'pending') return 'bg-warning text-dark';
+    if (s === 'cancelled') return 'bg-danger';
+    return 'bg-secondary';
 }
 
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric'
     });
 }
 
 async function viewBookingDetails(bookingId) {
     const modalBody = document.getElementById('bookingModalBody');
-
+    
+    // Show Loading Spinner
     modalBody.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Loading booking details...</p>
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Retrieving receipt details...</p>
         </div>
     `;
 
     try {
-        // In a real implementation, you'd have a specific API endpoint for booking details
-        // For now, we'll simulate with the booking data we already have
         const response = await apiService.getBookings();
         const booking = response.data.find(b => b.id == bookingId);
 
         if (booking) {
             modalBody.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Hotel Information</h6>
-                        <p><strong>${booking.hotel_name || 'Hotel Name'}</strong></p>
-                        <p><i class="fas fa-map-marker-alt me-1"></i>${booking.hotel_location || 'Location'}</p>
-                        <p><i class="fas fa-phone me-1"></i>+1 (555) 123-4567</p>
+                <div class="container-fluid">
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <h6 class="text-muted text-uppercase small">Hotel Information</h6>
+                            <h4 class="text-primary mb-1">${booking.hotel_name}</h4>
+                            <p class="text-muted mb-0"><i class="fas fa-map-marker-alt me-1"></i> ${booking.hotel_location || 'Address not available'}</p>
+                        </div>
+                        <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                            <h6 class="text-muted text-uppercase small">Booking ID</h6>
+                            <h4 class="mb-1">#${booking.id}</h4>
+                            <span class="badge ${getStatusClass(booking.status)}">${booking.status}</span>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <h6>Booking Details</h6>
-                        <p><strong>Booking ID:</strong> #${booking.id}</p>
-                        <p><strong>Status:</strong> <span class="badge ${getStatusClass(booking.status)}">${booking.status}</span></p>
-                        <p><strong>Total Price:</strong> $${booking.total_price || '0.00'}</p>
+
+                    <hr class="my-4">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-light p-3 rounded me-3">
+                                    <i class="fas fa-calendar-alt fa-lg text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Check-in / Check-out</small>
+                                    <strong>${formatDate(booking.checkInDate)}</strong> 
+                                    <i class="fas fa-long-arrow-alt-right mx-2 text-muted"></i> 
+                                    <strong>${formatDate(booking.checkOutDate)}</strong>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light p-3 rounded me-3">
+                                    <i class="fas fa-bed fa-lg text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Accomodation</small>
+                                    <strong>${booking.room_type}</strong> (Room #${booking.roomNumber})
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-light p-3 rounded me-3">
+                                    <i class="fas fa-user fa-lg text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Guest Contact</small>
+                                    <strong>${booking.guestName || 'Main Guest'}</strong><br>
+                                    <small class="text-muted">${booking.guestEmail}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light p-3 rounded me-3">
+                                    <i class="fas fa-users fa-lg text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Party Size</small>
+                                    <strong>${booking.guest_count} Guest(s)</strong>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Stay Information</h6>
-                        <p><strong>Check-in:</strong> ${formatDate(booking.check_in)}</p>
-                        <p><strong>Check-out:</strong> ${formatDate(booking.check_out)}</p>
-                        <p><strong>Room Type:</strong> ${booking.room_type || 'Standard Room'}</p>
-                        <p><strong>Guests:</strong> ${booking.guest_count || 1}</p>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="small text-uppercase text-muted"><i class="fas fa-comment-alt me-2"></i>Special Requests</h6>
+                        <p class="mb-0 italic">${booking.special_requests || 'No special requirements noted for this stay.'}</p>
                     </div>
-                    <div class="col-md-6">
-                        <h6>Special Requests</h6>
-                        <p>${booking.special_requests || 'No special requests'}</p>
+
+                    <div class="mt-4 border-top pt-3 text-end">
+                        <h6 class="text-muted mb-1">Total Price Paid</h6>
+                        <h3 class="text-primary">$${booking.room_price}</h3>
+                        <small class="text-muted">Booked on: ${new Date(booking.created_at).toLocaleString()}</small>
+                    </div>
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-1">Total Price Paid</h6>
+                        <h3 class="text-primary">$${booking.total_price}</h3>
                     </div>
                 </div>
             `;
         } else {
-            modalBody.innerHTML = `
-                <div class="text-center py-4">
-                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                    <h5>Booking not found</h5>
-                    <p class="text-muted">Unable to load booking details.</p>
-                </div>
-            `;
+            throw new Error("Booking not found");
         }
     } catch (error) {
-        console.error('Error loading booking details:', error);
         modalBody.innerHTML = `
-            <div class="text-center py-4">
-                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                <h5>Error loading details</h5>
-                <p class="text-muted">Please try again later.</p>
+            <div class="alert alert-danger m-3">
+                <i class="fas fa-exclamation-circle me-2"></i> Error loading details: ${error.message}
             </div>
         `;
     }
 }
 
 async function cancelBooking(bookingId) {
-    if (!confirm('Are you sure you want to cancel this booking?')) {
-        return;
-    }
+    if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+    // Find the button to show loading state
+    const cancelBtn = document.querySelector(`.cancel-booking[data-booking-id="${bookingId}"]`);
+    const originalContent = cancelBtn.innerHTML;
 
     try {
-        await apiService.cancelBooking({ booking_id: bookingId });
-        showAlert('Booking cancelled successfully.', 'success');
-        loadBookings(); // Reload bookings
+        // Disable UI during request
+        cancelBtn.disabled = true;
+        cancelBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`;
+
+        // The key must match your PHP $data->booking_id
+        const response = await apiService.cancelBooking({ booking_id: bookingId });
+
+        if (response.success) {
+            showAlert('Booking cancelled successfully.', 'success');
+            // Re-fetch the list to see the "Cancelled" badge
+            await loadBookings();
+        } else {
+            throw new Error(response.message || 'Failed to cancel');
+        }
     } catch (error) {
-        console.error('Error cancelling booking:', error);
-        showAlert('Failed to cancel booking. Please try again.', 'danger');
+        console.error('Cancellation Error:', error);
+        showAlert(error.message || 'Could not cancel booking. Please try again.', 'danger');
+        
+        // Reset button if failed
+        cancelBtn.disabled = false;
+        cancelBtn.innerHTML = originalContent;
     }
 }
 
 function showAlert(message, type = 'danger') {
     const alert = document.getElementById('bookingAlert');
-    alert.className = `alert alert-${type}`;
-    alert.textContent = message;
-    alert.style.display = 'block';
-
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-        alert.style.display = 'none';
-    }, 5000);
+    if (alert) {
+        alert.className = `alert alert-${type} show`;
+        alert.textContent = message;
+        alert.style.display = 'block';
+        setTimeout(() => alert.style.display = 'none', 5000);
+    }
 }

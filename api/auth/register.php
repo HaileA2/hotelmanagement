@@ -1,6 +1,4 @@
 <?php
-
-/** api/auth/register.php */
 // Include CORS configuration
 require_once '../config/cors.php';
 header('Content-Type: application/json; charset=UTF-8');
@@ -121,10 +119,20 @@ try {
     }
 } catch (Exception $e) {
     // Log the error for debugging
-    error_log('Registration error: ' . $e->getMessage());
+    // Log the error for debugging (application log)
+    $logPath = __DIR__ . '/../../logs/auth_errors.log';
+    $errorMessage = '[' . date('Y-m-d H:i:s') . '] Registration error: ' . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n";
+    // Use file append so we don't rely on php.ini error_log destination
+    @file_put_contents($logPath, $errorMessage, FILE_APPEND | LOCK_EX);
 
-    // Send a generic error message to the client
-    sendResponse(500, 'An error occurred during registration. Please try again.');
+    // Also send a helpful debug message back to the client (remove or restrict in production)
+    $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
+    $clientMessage = 'An error occurred during registration. Please try again.';
+    if ($debug) {
+        $clientMessage .= ' Debug: ' . $e->getMessage();
+    }
+
+    sendResponse(500, $clientMessage);
 }
 
 // The sendVerificationEmail function is now in helpers/email.php
