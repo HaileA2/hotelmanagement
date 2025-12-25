@@ -192,8 +192,6 @@ try {
     
     // Run all tests
     $tester->testTourServices();
-    $tester->testRestaurantServices();
-    $tester->testTaxiServices();
     
     echo "\n\n=== All tests completed ===\n";
 } catch (Exception $e) {

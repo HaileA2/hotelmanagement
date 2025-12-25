@@ -18,9 +18,11 @@ class ExternalApiClient {
             'Content-Type' => 'application/json'
         ];
         
-        // Add API key if provided
+        // Add API key if provided - send both Authorization and X-API-KEY to support different providers
         if ($this->apiKey) {
             $defaultHeaders['Authorization'] = 'Bearer ' . $this->apiKey;
+            // Some providers prefer an X-API-KEY header (we include both for compatibility)
+            $defaultHeaders['X-API-KEY'] = $this->apiKey;
         }
         
         // Merge default and custom headers

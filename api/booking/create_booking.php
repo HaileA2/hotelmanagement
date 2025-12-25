@@ -81,7 +81,7 @@ if (
 
     
 
-    // 7. Create the Booking
+    // 7. Create the Booking (local-only)
     if ($booking->create()) {
         http_response_code(201);
         echo json_encode([

@@ -43,6 +43,8 @@ $tokenData = $jwt->getTokenPayload($token);
 // Initialize Hotel object
 $hotel = new Hotel($db);
 
+
+
 try {
     // Query hotels
     $stmt = $hotel->read();

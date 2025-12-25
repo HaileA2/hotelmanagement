@@ -4,7 +4,7 @@ class ApiService {
         this.baseURL = '/hotelmanagement';
     }
 
-    // --- INTERNAL HELPERS (The "Engine") ---
+    // --- INTERNAL HELPERS ---
     async get(url, params = {}) {
         const queryString = new URLSearchParams(params).toString();
         const fullUrl = queryString ? `${this.baseURL}${url}?${queryString}` : `${this.baseURL}${url}`;
@@ -45,20 +45,43 @@ class ApiService {
         const token = localStorage.getItem('token');
         return {
             'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : ''
+            ...(token && { 'Authorization': `Bearer ${token}` }),
         };
     }
 
     async handleResponse(response) {
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.message || 'API request failed');
+        const contentType = response.headers.get("content-type");
+
+        // Check if the response is actually JSON
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            console.error("Server returned non-JSON response:", text);
+            throw new Error("Server Error: The server did not return valid JSON.");
         }
+
+        const data = await response.json();
+
+        // Normalize legacy response shapes where some endpoints return { status: 'success' }
+        if (data && typeof data === 'object' && ('status' in data) && !('success' in data)) {
+            data.success = String(data.status).toLowerCase() === 'success';
+        }
+
+        // Normalize common message fields
+        if (data && typeof data === 'object') {
+            if (!data.message && data.msg) data.message = data.msg;
+            if (!data.message && data.error) data.message = data.error;
+        }
+
+        if (!response.ok) {
+            // Handle HTTP errors (and PHP-level success:false by reading message)
+            throw new Error((data && data.message) || 'API request failed');
+        }
+
         return data;
     }
 
-    // --- REFACTORED API METHODS (Using the helpers above) ---
-    
+    // --- API METHODS ---
+
     // ROOMS
     async getRooms(hotelId = null) {
         return this.get('/api/room/list_rooms.php', hotelId ? { hotel_id: hotelId } : {});
@@ -85,6 +108,15 @@ class ApiService {
         return this.get('/api/hotel/hotel_details.php', { hotel_id: hotelId });
     }
 
+    // TOURS
+    async getTours(params = {}) {
+        return this.get('/api/services/tours.php', params);
+    }
+
+    async bookTour(data) {
+        return this.post('/api/services/tours.php', data);
+    }
+
     // BOOKINGS
     async getBookings() {
         return this.get('/api/booking/list_bookings.php');
@@ -94,11 +126,7 @@ class ApiService {
         return this.post('/api/booking/create_booking.php', data);
     }
 
-/**
-     * Cancel a specific booking
-     * @param {Object} data - Should contain { booking_id: id }
-     */
-async cancelBooking(data) {
+    async cancelBooking(data) {
         return this.post('/api/booking/cancel_booking.php', data);
     }
 

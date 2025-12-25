@@ -1,0 +1,6 @@
+/.env
+.env.local
+.env.*
+# Dependency directories (add if you use composer/npm)
+/vendor/
+/node_modules/

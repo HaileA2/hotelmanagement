@@ -49,6 +49,8 @@ if (!$hotel_id) {
 $hotel = new Hotel($db);
 $room = new Room($db);
 
+
+
 try {
     // 1. Fetch Hotel Details (Using the updated readOne that returns an array)
     $hotel_data = $hotel->readOne($hotel_id);
