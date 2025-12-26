@@ -108,6 +108,19 @@ class ApiService {
         return this.get('/api/hotel/hotel_details.php', { hotel_id: hotelId });
     }
 
+    async createHotel(hotelData) {
+        return this.post('/api/hotel/create_hotel.php', hotelData);
+    }
+
+    async updateHotel(hotelData) {
+        // update_hotel expects a JSON body with id and fields
+        return this.put('/api/hotel/update_hotel.php', hotelData);
+    }
+
+    async deleteHotel(hotelId) {
+        return this.delete(`/api/hotel/delete_hotel.php?id=${hotelId}`);
+    }
+
     // TOURS
     async getTours(params = {}) {
         return this.get('/api/services/tours.php', params);
@@ -133,6 +146,22 @@ class ApiService {
     // USER
     async getCurrentUserProfile() {
         return this.get('/api/user/profile.php');
+    }
+
+    async getUsers() {
+        return this.get('/api/user/list_users.php');
+    }
+
+    async createUser(userData) {
+        return this.post('/api/user/create_user.php', userData);
+    }
+
+    async updateUser(userData) {
+        return this.put('/api/user/update_user.php', userData);
+    }
+
+    async deleteUser(userId) {
+        return this.delete(`/api/user/delete_user.php?id=${userId}`);
     }
 }
 

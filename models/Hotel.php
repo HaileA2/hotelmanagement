@@ -8,6 +8,9 @@ class Hotel {
     public $id;
     public $name;
     public $location;
+    public $address;
+    public $city;
+    public $country;
     public $description;
     public $price_per_night;
     public $amenities;
@@ -38,10 +41,14 @@ class Hotel {
             $this->id = $row['id'];
             $this->name = $row['name'];
             $this->location = $row['location'];
+            $this->address = $row['address'] ?? '';
+            $this->city = $row['city'] ?? '';
+            $this->country = $row['country'] ?? '';
             $this->description = $row['description'];
             $this->amenities = $row['amenities'];
             $this->price_per_night = $row['price_per_night'] ?? 0;
             $this->created_at = $row['created_at'];
+            $this->rating = $row['rating'] ?? 0;
             
             return $row; // Return the array so the API can use it immediately
         }
@@ -57,54 +64,72 @@ class Hotel {
     }
 
 public function create() {
-        // UPDATED: Added rating to INSERT query
-        $query = "INSERT INTO " . $this->table_name . " 
-                SET name=:name, location=:location, description=:description, 
-                    amenities=:amenities, rating=:rating, created_at=:created_at";
+    // UPDATED: Added rating, address, city, country, price_per_night to INSERT query
+    $query = "INSERT INTO " . $this->table_name . "
+            SET name=:name, location=:location, address=:address, city=:city, country=:country,
+                description=:description, amenities=:amenities, price_per_night=:price_per_night,
+                rating=:rating, created_at=:created_at";
 
-        $stmt = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
 
-        $this->name = htmlspecialchars(strip_tags($this->name));
-        $this->location = htmlspecialchars(strip_tags($this->location));
-        $this->description = htmlspecialchars(strip_tags($this->description));
-        $this->amenities = htmlspecialchars(strip_tags($this->amenities));
-        $this->rating = (float)$this->rating; // Ensure numeric
-        $this->created_at = date('Y-m-d H:i:s');
+    $this->name = htmlspecialchars(strip_tags($this->name));
+    $this->location = htmlspecialchars(strip_tags($this->location));
+    $this->address = htmlspecialchars(strip_tags($this->address));
+    $this->city = htmlspecialchars(strip_tags($this->city));
+    $this->country = htmlspecialchars(strip_tags($this->country));
+    $this->description = htmlspecialchars(strip_tags($this->description));
+    $this->amenities = htmlspecialchars(strip_tags($this->amenities));
+    $this->price_per_night = (float)$this->price_per_night;
+    $this->rating = (float)$this->rating; // Ensure numeric
+    $this->created_at = date('Y-m-d H:i:s');
 
-        $stmt->bindParam(":name", $this->name);
-        $stmt->bindParam(":location", $this->location);
-        $stmt->bindParam(":description", $this->description);
-        $stmt->bindParam(":amenities", $this->amenities);
-        $stmt->bindParam(":rating", $this->rating);
-        $stmt->bindParam(":created_at", $this->created_at);
+    $stmt->bindParam(":name", $this->name);
+    $stmt->bindParam(":location", $this->location);
+    $stmt->bindParam(":address", $this->address);
+    $stmt->bindParam(":city", $this->city);
+    $stmt->bindParam(":country", $this->country);
+    $stmt->bindParam(":description", $this->description);
+    $stmt->bindParam(":amenities", $this->amenities);
+    $stmt->bindParam(":price_per_night", $this->price_per_night);
+    $stmt->bindParam(":rating", $this->rating);
+    $stmt->bindParam(":created_at", $this->created_at);
 
-        if ($stmt->execute()) {
-            $this->id = $this->conn->lastInsertId();
-            return true;
-        }
-        return false;
+    if ($stmt->execute()) {
+        $this->id = $this->conn->lastInsertId();
+        return true;
     }
+    return false;
+}
 
     public function update() {
-        // UPDATED: Added rating to UPDATE query
-        $query = "UPDATE " . $this->table_name . " 
-                SET name=:name, location=:location, description=:description, 
-                    amenities=:amenities, rating=:rating 
+        // UPDATED: Added address, city, country, price_per_night, rating to UPDATE query
+        $query = "UPDATE " . $this->table_name . "
+                SET name=:name, location=:location, address=:address, city=:city, country=:country,
+                    description=:description, amenities=:amenities, price_per_night=:price_per_night,
+                    rating=:rating
                 WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
 
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->location = htmlspecialchars(strip_tags($this->location));
+        $this->address = htmlspecialchars(strip_tags($this->address));
+        $this->city = htmlspecialchars(strip_tags($this->city));
+        $this->country = htmlspecialchars(strip_tags($this->country));
         $this->description = htmlspecialchars(strip_tags($this->description));
         $this->amenities = htmlspecialchars(strip_tags($this->amenities));
+        $this->price_per_night = (float)$this->price_per_night;
         $this->rating = (float)$this->rating;
         $this->id = htmlspecialchars(strip_tags($this->id));
 
         $stmt->bindParam(':name', $this->name);
         $stmt->bindParam(':location', $this->location);
+        $stmt->bindParam(':address', $this->address);
+        $stmt->bindParam(':city', $this->city);
+        $stmt->bindParam(':country', $this->country);
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':amenities', $this->amenities);
+        $stmt->bindParam(':price_per_night', $this->price_per_night);
         $stmt->bindParam(':rating', $this->rating);
         $stmt->bindParam(':id', $this->id);
 

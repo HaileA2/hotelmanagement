@@ -45,15 +45,17 @@ if (!$jwt->validateToken($token) || !in_array($tokenData['role'], ['admin', 'man
 // Set hotel ID and properties
 $hotel->id = $data->id ?? 0;
 $hotel->name = $data->name ?? '';
-$hotel->description = $data->description ?? '';
+$hotel->location = $data->location ?? '';
 $hotel->address = $data->address ?? '';
 $hotel->city = $data->city ?? '';
 $hotel->country = $data->country ?? '';
+$hotel->description = $data->description ?? '';
+$hotel->price_per_night = $data->price_per_night ?? 0;
 $hotel->rating = $data->rating ?? 0;
 $hotel->amenities = isset($data->amenities) ? json_encode($data->amenities) : '[]';
 
 // Validate input
-if (empty($hotel->id) || empty($hotel->name) || empty($hotel->address)) {
+if (empty($hotel->id) || empty($hotel->name)) {
     http_response_code(400);
     echo json_encode(["message" => "Unable to update hotel. Data is incomplete."]);
     exit();

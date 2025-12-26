@@ -69,7 +69,7 @@ try {
     }
     
     // Check if user has admin role
-    if ($payload['role'] !== 'Admin') {
+    if (strtolower($payload['role']) !== 'admin') {
         http_response_code(403);
         echo json_encode([
             "status" => "error",

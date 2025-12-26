@@ -38,7 +38,11 @@ if (!$jwt->validateToken($token) || !in_array($tokenData['role'], ['admin', 'man
 // Set properties
 $hotel->name = $data->name ?? '';
 $hotel->description = $data->description ?? '';
-$hotel->location = $data->location ?? ''; // Simplified location field
+$hotel->location = $data->location ?? '';
+$hotel->address = $data->address ?? '';
+$hotel->city = $data->city ?? '';
+$hotel->country = $data->country ?? '';
+$hotel->price_per_night = $data->price_per_night ?? 0;
 $hotel->rating = $data->rating ?? 0;
 $hotel->amenities = isset($data->amenities) ? (is_array($data->amenities) ? json_encode($data->amenities) : $data->amenities) : '[]';
 

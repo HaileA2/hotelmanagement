@@ -1,6 +1,7 @@
 /** public/assets/js/hotels.js **/
 /** public/assets/js/hotels.js **/
 import apiService from './services/apiService.js';
+import { authService } from './services/auth.service.js';
 
 // Configuration
 const PAGE_SIZE = 8;
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPriceSlider();
     bindUI();
     loadHotels();
+    renderAdminBarIfAllowed();
 });
 
 function bindUI() {
@@ -24,6 +26,7 @@ function bindUI() {
     document.getElementById('searchInput').addEventListener('input', debounce(() => applyFilters(), 300));
 }
 
+hotelSaveBtn
 async function loadHotels() {
     const container = document.getElementById('hotelsList');
     // Show a clean loading state
@@ -118,12 +121,254 @@ function createHotelCard(h) {
                         <span class="h5 mb-0 text-primary">$${price}</span>
                         <span class="text-muted extra-small">/night</span>
                     </div>
-                    <a href="hotel-details.html?hotel_id=${h.id}" class="btn btn-sm btn-primary px-3">View Details</a>
+                    <div class="d-flex gap-2 align-items-center">
+                        <a href="hotel-details.html?hotel_id=${h.id}" class="btn btn-sm btn-primary px-3">View Details</a>
+                        ${renderAdminButtons(h.id)}
+                    </div>
                 </div>
             </div>
         </div>
     `;
     return col;
+}
+
+function renderAdminButtons(hotelId) {
+    try {
+        const user = authService.getCurrentUser();
+        if (!user) return '';
+        const role = (user.role || '').toLowerCase();
+        if (!['admin', 'manager'].includes(role)) return '';
+
+        return `
+            <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-secondary btn-edit-hotel" data-id="${hotelId}">Edit</button>
+                <button class="btn btn-sm btn-outline-danger btn-delete-hotel" data-id="${hotelId}">Delete</button>
+            </div>
+        `;
+    } catch (e) {
+        return '';
+    }
+}
+
+// Inject admin bar (Add Hotel) and modal markup when current user is admin/manager
+function renderAdminBarIfAllowed() {
+    const user = authService.getCurrentUser();
+    if (!user) return;
+    const role = (user.role || '').toLowerCase();
+    if (!['admin', 'manager'].includes(role)) return;
+
+    // Add Add Hotel button near the top heading
+    const heading = document.querySelector('.d-flex.justify-content-between.align-items-center.mb-3');
+    if (heading) {
+        const existingBtn = document.getElementById('addHotelBtn');
+        if (existingBtn) {
+            // Reveal the static button and bind handler if not already bound
+            existingBtn.classList.remove('d-none');
+            if (!existingBtn.dataset.bound) {
+                existingBtn.addEventListener('click', () => showHotelModal());
+                existingBtn.dataset.bound = 'true';
+            }
+        } else {
+            const wrap = document.createElement('div');
+            wrap.className = 'ms-3';
+            wrap.innerHTML = `<button id="addHotelBtn" class="btn btn-outline-success">+ Add Hotel</button>`;
+            heading.appendChild(wrap);
+            document.getElementById('addHotelBtn').addEventListener('click', () => showHotelModal());
+        }
+    }
+
+    injectHotelModal();
+}
+
+function injectHotelModal() {
+    if (document.getElementById('hotelModal')) return;
+    const modal = document.createElement('div');
+    modal.innerHTML = `
+    <div class="modal fade" id="hotelModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="hotelModalTitle">Add Hotel</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="hotelModalAlert" style="display:none"></div>
+            <form id="hotelForm">
+              <input type="hidden" id="hotelId" />
+              <div class="mb-3"><label class="form-label">Name</label><input id="hotelName" class="form-control" required></div>
+                            <div class="mb-3"><label class="form-label">Location</label><input id="hotelLocation" class="form-control"></div>
+                            <div class="mb-3"><label class="form-label">Address</label><input id="hotelAddress" class="form-control"></div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="form-label">City</label><input id="hotelCity" class="form-control"></div>
+                                <div class="col-md-6 mb-3"><label class="form-label">Country</label><input id="hotelCountry" class="form-control"></div>
+                            </div>
+                            <div class="mb-3"><label class="form-label">Price per night</label><input id="hotelPrice" type="number" class="form-control"></div>
+                            <div class="mb-3"><label class="form-label">Rating</label><input id="hotelRating" type="number" min="0" max="5" step="0.1" class="form-control"></div>
+                            <div class="mb-3"><label class="form-label">Amenities (comma separated)</label><input id="hotelAmenities" class="form-control"></div>
+                            <div class="mb-3"><label class="form-label">Description</label><textarea id="hotelDescription" class="form-control"></textarea></div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" id="hotelSaveBtn" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+
+    // Bind save handler
+    document.getElementById('hotelSaveBtn').addEventListener('click', async () => {
+        // Check authentication and role before attempting save
+        const token = authService.getToken();
+        const user = authService.getCurrentUser();
+        const role = (user && user.role) ? String(user.role).toLowerCase() : null;
+        if (!token || !user || !['admin', 'manager'].includes(role)) {
+            showModalAlert('You must be logged in as Admin or Manager to perform this action.', 'danger');
+            return;
+        }
+        const id = document.getElementById('hotelId').value;
+
+        // Common fields
+        const name = document.getElementById('hotelName').value.trim();
+        const location = document.getElementById('hotelLocation').value.trim();
+        const address = document.getElementById('hotelAddress').value.trim();
+        const city = document.getElementById('hotelCity').value.trim();
+        const country = document.getElementById('hotelCountry').value.trim();
+        const price_per_night = parseFloat(document.getElementById('hotelPrice').value) || 0;
+        const rating = parseFloat(document.getElementById('hotelRating').value) || 0;
+        const amenities = (document.getElementById('hotelAmenities').value || '').split(',').map(s => s.trim()).filter(Boolean);
+        const description = document.getElementById('hotelDescription').value.trim();
+
+        try {
+            if (id) {
+                // Update: map to server-expected fields for update_hotel.php
+                const payload = {
+                    id: parseInt(id),
+                    name,
+                    location,
+                    address,
+                    city,
+                    country,
+                    description,
+                    price_per_night,
+                    rating,
+                    amenities
+                };
+                await apiService.updateHotel(payload);
+                showModalAlert('Hotel updated successfully.', 'success');
+            } else {
+                // Create: map to create_hotel.php expected fields
+                const payload = {
+                    name,
+                    location,
+                    address,
+                    city,
+                    country,
+                    description,
+                    price_per_night,
+                    rating,
+                    amenities
+                };
+                await apiService.createHotel(payload);
+                showModalAlert('Hotel created successfully.', 'success');
+            }
+
+            // Close and refresh after a short delay
+            setTimeout(() => {
+                const modalEl = document.getElementById('hotelModal');
+                const bsModal = bootstrap.Modal.getInstance(modalEl);
+                bsModal.hide();
+                loadHotels();
+            }, 700);
+        } catch (err) {
+            showModalAlert(err.message || 'Unable to save hotel.', 'danger');
+        }
+    });
+
+    // Delegate edit/delete button clicks
+    document.body.addEventListener('click', async (e) => {
+        if (e.target.matches('.btn-edit-hotel')) {
+            const token = authService.getToken();
+            const user = authService.getCurrentUser();
+            const role = (user && user.role) ? String(user.role).toLowerCase() : null;
+            if (!token || !user || !['admin', 'manager'].includes(role)) {
+                alert('You must be logged in as Admin or Manager to edit hotels.');
+                return;
+            }
+            const id = e.target.getAttribute('data-id');
+            await openEditHotel(id);
+        } else if (e.target.matches('.btn-delete-hotel')) {
+            const token = authService.getToken();
+            const user = authService.getCurrentUser();
+            const role = (user && user.role) ? String(user.role).toLowerCase() : null;
+            if (!token || !user || !['admin', 'manager'].includes(role)) {
+                alert('You must be logged in as Admin or Manager to delete hotels.');
+                return;
+            }
+            const id = e.target.getAttribute('data-id');
+            await confirmAndDeleteHotel(id);
+        }
+    });
+}
+
+function showModalAlert(msg, type = 'info') {
+    const el = document.getElementById('hotelModalAlert');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+}
+
+async function openEditHotel(id) {
+    try {
+        const res = await apiService.getHotelDetails(id);
+        if (!res.success) throw new Error(res.message || 'Failed to fetch hotel');
+    const hotel = res.data.hotel || res.data;
+    document.getElementById('hotelId').value = hotel.id || '';
+    document.getElementById('hotelName').value = hotel.name || '';
+    // Fill location, address, city, country
+    document.getElementById('hotelLocation').value = hotel.location || '';
+    document.getElementById('hotelAddress').value = hotel.address || '';
+    document.getElementById('hotelCity').value = hotel.city || '';
+    document.getElementById('hotelCountry').value = hotel.country || '';
+    document.getElementById('hotelPrice').value = hotel.price_per_night || '';
+    document.getElementById('hotelRating').value = hotel.rating || '';
+    document.getElementById('hotelAmenities').value = Array.isArray(hotel.amenities) ? hotel.amenities.join(', ') : (typeof hotel.amenities === 'string' ? hotel.amenities : '');
+    document.getElementById('hotelDescription').value = hotel.description || '';
+        document.getElementById('hotelModalTitle').textContent = 'Edit Hotel';
+        document.getElementById('hotelModalAlert').style.display = 'none';
+        const modalEl = document.getElementById('hotelModal');
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+    } catch (err) {
+        alert(err.message || 'Unable to load hotel for editing');
+    }
+}
+
+async function confirmAndDeleteHotel(id) {
+    if (!confirm('Are you sure you want to delete this hotel? This action cannot be undone.')) return;
+    try {
+        await apiService.deleteHotel(id);
+        loadHotels();
+    } catch (err) {
+        alert(err.message || 'Unable to delete hotel');
+    }
+}
+
+function showHotelModal() {
+    document.getElementById('hotelId').value = '';
+    document.getElementById('hotelName').value = '';
+    document.getElementById('hotelLocation').value = '';
+    document.getElementById('hotelPrice').value = '';
+    document.getElementById('hotelRating').value = '';
+    document.getElementById('hotelAmenities').value = '';
+    document.getElementById('hotelDescription').value = '';
+    document.getElementById('hotelModalTitle').textContent = 'Add Hotel';
+    document.getElementById('hotelModalAlert').style.display = 'none';
+    const modalEl = document.getElementById('hotelModal');
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
 }
 
 

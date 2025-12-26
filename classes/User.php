@@ -10,11 +10,15 @@ class User {
     public $password;
     public $first_name;
     public $last_name;
+    public $phone;
+    public $profile_image;
     public $role; // 'admin', 'manager', 'customer'
-    public $professional_details; // JSON string for professional information
     public $email_verified = false;
     public $verification_token;
     public $verification_expires;
+    public $status;
+    public $last_login;
+    public $professional_details; // JSON string for professional information
     public $created_at;
     public $updated_at;
 
@@ -27,18 +31,21 @@ class User {
         $this->verification_token = bin2hex(random_bytes(32));
         $verification_expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
         
-        $query = "INSERT INTO " . $this->table_name . " 
-                 SET email = :email, 
-                     password = :password, 
-                     first_name = :first_name,
-                     last_name = :last_name,
-                     role = :role,
-                     professional_details = :professional_details,
-                     verification_token = :verification_token,
-                     verification_expires = :verification_expires,
-                     email_verified = :email_verified,
-                     created_at = NOW(),
-                     updated_at = NOW()";
+        $query = "INSERT INTO " . $this->table_name . "
+                  SET email = :email,
+                      password = :password,
+                      first_name = :first_name,
+                      last_name = :last_name,
+                      phone = :phone,
+                      profile_image = :profile_image,
+                      role = :role,
+                      professional_details = :professional_details,
+                      verification_token = :verification_token,
+                      verification_expires = :verification_expires,
+                      email_verified = :email_verified,
+                      status = :status,
+                      created_at = NOW(),
+                      updated_at = NOW()";
 
         $stmt = $this->conn->prepare($query);
 
@@ -66,6 +73,11 @@ class User {
             $this->professional_details = null;
         }
 
+        // Set defaults
+        $this->phone = $this->phone ?? null;
+        $this->profile_image = $this->profile_image ?? null;
+        $this->status = $this->status ?? 'active';
+
         // Validate password
         if (empty($this->password)) {
             throw new Exception('Password cannot be empty');
@@ -73,8 +85,8 @@ class User {
 
         // Hash the password with a strong algorithm
         $this->password = password_hash(
-            $this->password, 
-            PASSWORD_BCRYPT, 
+            $this->password,
+            PASSWORD_BCRYPT,
             ['cost' => 12]
         );
 
@@ -87,12 +99,15 @@ class User {
         $stmt->bindParam(":password", $this->password);
         $stmt->bindParam(":first_name", $this->first_name);
         $stmt->bindParam(":last_name", $this->last_name);
+        $stmt->bindParam(":phone", $this->phone);
+        $stmt->bindParam(":profile_image", $this->profile_image);
         $stmt->bindParam(":role", $this->role);
         $stmt->bindParam(":professional_details", $this->professional_details);
         $stmt->bindParam(":verification_token", $this->verification_token);
         $stmt->bindParam(":verification_expires", $verification_expires);
         $email_verified_int = $this->email_verified ? 1 : 0;
         $stmt->bindParam(":email_verified", $email_verified_int, PDO::PARAM_INT);
+        $stmt->bindParam(":status", $this->status);
 
         if($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
@@ -177,23 +192,23 @@ class User {
     }
 
     public function read() {
-        $query = "SELECT id, email, first_name, last_name, role, professional_details, 
-                         email_verified, created_at, updated_at 
-                 FROM " . $this->table_name . " 
-                 ORDER BY created_at DESC";
+        $query = "SELECT id, email, first_name, last_name, phone, profile_image, role, professional_details,
+                          email_verified, status, last_login, created_at, updated_at
+                  FROM " . $this->table_name . "
+                  ORDER BY created_at DESC";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        
+
         return $stmt;
     }
 
     public function getById($id) {
-        $query = "SELECT id, email, first_name, last_name, role, professional_details,
-                        email_verified, created_at, updated_at
-                  FROM " . $this->table_name . "
-                  WHERE id = ?
-                  LIMIT 0,1";
+        $query = "SELECT id, email, first_name, last_name, phone, profile_image, role, professional_details,
+                         email_verified, status, last_login, created_at, updated_at
+                   FROM " . $this->table_name . "
+                   WHERE id = ?
+                   LIMIT 0,1";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $id);
@@ -206,9 +221,13 @@ class User {
             $this->email = $row['email'];
             $this->first_name = $row['first_name'];
             $this->last_name = $row['last_name'];
+            $this->phone = $row['phone'];
+            $this->profile_image = $row['profile_image'];
             $this->role = strtolower($row['role']);
             $this->professional_details = $row['professional_details'];
             $this->email_verified = (bool)$row['email_verified'];
+            $this->status = $row['status'];
+            $this->last_login = $row['last_login'];
             $this->created_at = $row['created_at'];
             $this->updated_at = $row['updated_at'];
             return true;
@@ -263,14 +282,17 @@ class User {
 
     public function update() {
         $query = "UPDATE " . $this->table_name . " SET
-                  email = :email,
-                  first_name = :first_name,
-                  last_name = :last_name,
-                  password = :password,
-                  role = :role,
-                  professional_details = :professional_details,
-                  updated_at = NOW()
-                  WHERE id = :id";
+                   email = :email,
+                   first_name = :first_name,
+                   last_name = :last_name,
+                   phone = :phone,
+                   profile_image = :profile_image,
+                   password = :password,
+                   role = :role,
+                   professional_details = :professional_details,
+                   status = :status,
+                   updated_at = NOW()
+                   WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
 
@@ -284,13 +306,30 @@ class User {
         $stmt->bindParam(':email', $this->email);
         $stmt->bindParam(':first_name', $this->first_name);
         $stmt->bindParam(':last_name', $this->last_name);
+        $stmt->bindParam(':phone', $this->phone);
+        $stmt->bindParam(':profile_image', $this->profile_image);
         $stmt->bindParam(':password', $this->password);
         $stmt->bindParam(':role', $this->role);
         $stmt->bindParam(':professional_details', $this->professional_details);
+        $stmt->bindParam(':status', $this->status);
         $stmt->bindParam(':id', $this->id);
 
         if($stmt->execute()) {
             return true;
+        }
+
+        $error = $stmt->errorInfo();
+        throw new Exception('Database error: ' . ($error[2] ?? 'Unknown error'));
+    }
+
+    public function delete() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->id);
+
+        if($stmt->execute()) {
+            return $stmt->rowCount() > 0;
         }
 
         $error = $stmt->errorInfo();

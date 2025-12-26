@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browse Hotels - HotelHub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --accent-color: #198754;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .hotel-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .hotel-img-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .rating-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .amenities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .amenity-badge {
+            background-color: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .view-details-btn {
+            transition: all 0.3s ease;
+        }
+
+        .view-details-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .filter-card {
+            position: sticky;
+            top: 20px;
+        }
+
+        .hotel-features {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        /* Hotel Details Modal */
+        .modal-amenity {
+            padding: 8px 16px;
+            background: #e9ecef;
+            border-radius: 20px;
+            margin: 4px;
+            display: inline-block;
+        }
+
+        .star-rating {
+            color: #ffc107;
+        }
+
+        .empty-star {
+            color: #dee2e6;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hotel-card {
+                margin-bottom: 20px;
+            }
+            
+            .filter-card {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-hotel me-2"></i>HotelHub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="hotels.html">
+                            <i class="fas fa-building me-1"></i>Browse Hotels
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    <div class="input-group me-3" style="max-width: 300px;">
+                        <input type="text" class="form-control" id="globalSearch" placeholder="Search hotels...">
+                        <button class="btn btn-outline-primary" type="button" id="globalSearchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <a href="#" class="btn btn-outline-primary me-2" onclick="showLoginModal()">
+                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-4">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="search-box">
+                        <h1 class="h3 mb-3">Discover Amazing Hotels</h1>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" id="searchInput" 
+                                           placeholder="Search by hotel name, location, or amenities">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="sortSelect">
+                                    <option value="">Sort by</option>
+                                    <option value="rating_desc">Rating: High to Low</option>
+                                    <option value="rating_asc">Rating: Low to High</option>
+                                    <option value="name_asc">Name: A to Z</option>
+                                    <option value="name_desc">Name: Z to A</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100" id="searchBtn">
+                                    <i class="fas fa-filter me-1"></i>Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Filters Sidebar -->
+                <div class="col-lg-3 mb-4">
+                    <div class="card filter-card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-sliders-h me-2"></i>Filters</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Price Filter -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-dollar-sign me-1"></i>Price Range
+                                </h6>
+                                <div id="priceSlider" class="mb-3"></div>
+                                <div class="d-flex justify-content-between">
+                                    <small>Min: <span id="priceMin">$0</span></small>
+                                    <small>Max: <span id="priceMax">$1000+</span></small>
+                                </div>
+                            </div>
+
+                            <!-- Rating Filter -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-star me-1"></i>Rating
+                                </h6>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="rating5" value="5">
+                                    <label class="form-check-label" for="rating5">
+                                        <span class="star-rating">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </span> 5 Stars
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="rating4" value="4">
+                                    <label class="form-check-label" for="rating4">
+                                        <span class="star-rating">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star empty-star"></i>
+                                        </span> 4+ Stars
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="rating3" value="3">
+                                    <label class="form-check-label" for="rating3">
+                                        <span class="star-rating">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star empty-star"></i>
+                                            <i class="fas fa-star empty-star"></i>
+                                        </span> 3+ Stars
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Amenities Filter -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-concierge-bell me-1"></i>Amenities
+                                </h6>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="amenityWifi" value="Free WiFi">
+                                    <label class="form-check-label" for="amenityWifi">
+                                        <i class="fas fa-wifi me-1"></i>Free WiFi
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="amenityPool" value="Swimming Pool">
+                                    <label class="form-check-label" for="amenityPool">
+                                        <i class="fas fa-swimming-pool me-1"></i>Pool
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="amenityParking" value="Parking">
+                                    <label class="form-check-label" for="amenityParking">
+                                        <i class="fas fa-parking me-1"></i>Parking
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="amenityRestaurant" value="Restaurant">
+                                    <label class="form-check-label" for="amenityRestaurant">
+                                        <i class="fas fa-utensils me-1"></i>Restaurant
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" id="applyFilters">
+                                    <i class="fas fa-check me-1"></i>Apply Filters
+                                </button>
+                                <button class="btn btn-outline-secondary" id="resetFilters">
+                                    <i class="fas fa-redo me-1"></i>Reset All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hotels Listing -->
+                <div class="col-lg-9">
+                    <!-- Results Info -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="mb-0" id="resultsTitle">All Hotels</h4>
+                            <p class="text-muted mb-0" id="resultsCount">Loading...</p>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" id="viewGrid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="viewList">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hotels Container -->
+                    <div id="hotelsContainer">
+                        <div class="text-center py-5">
+                            <div class="loading-spinner mx-auto mb-3"></div>
+                            <p>Loading hotels...</p>
+                        </div>
+                    </div>
+
+                    <!-- No Results -->
+                    <div id="noResults" class="no-results" style="display: none;">
+                        <i class="fas fa-hotel"></i>
+                        <h4 class="mt-3">No hotels found</h4>
+                        <p class="text-muted">Try adjusting your filters or search terms</p>
+                        <button class="btn btn-primary mt-2" id="resetFilters2">
+                            <i class="fas fa-redo me-1"></i>Reset Filters
+                        </button>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Hotel pagination" class="mt-5" id="paginationContainer" style="display: none;">
+                        <ul class="pagination justify-content-center" id="pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hotel Details Modal -->
+    <div class="modal fade" id="hotelDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalHotelName"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="hotel-img-placeholder mb-3" style="height: 250px;">
+                                <i class="fas fa-hotel fa-3x"></i>
+                            </div>
+                            <div class="mb-3">
+                                <span class="rating-badge" id="modalRating">
+                                    <i class="fas fa-star"></i> 0.00
+                                </span>
+                                <span class="ms-3" id="modalLocation">
+                                    <i class="fas fa-map-marker-alt"></i> Location not specified
+                                </span>
+                            </div>
+                            <p class="mb-3" id="modalDescription"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Quick Info</h6>
+                                    <div class="mb-3">
+                                        <div class="price-tag" id="modalPrice">$0</div>
+                                        <small class="text-muted">per night</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6>Amenities:</h6>
+                                        <div id="modalAmenities"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            Listed: <span id="modalCreatedAt"></span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="showLoginModal()">
+                        <i class="fas fa-calendar-check me-1"></i>Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Required Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login Required</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-lock fa-3x text-warning mb-3"></i>
+                    <h5>Please login to continue</h5>
+                    <p class="text-muted">You need to be logged in to make bookings or access additional features.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='login.html'">
+                        Go to Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="fas fa-hotel me-2"></i>HotelHub</h5>
+                    <p class="text-white-50">Discover and explore the best hotels worldwide. Your perfect stay is just a click away.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Contact</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Contact Info</h5>
+                    <ul class="list-unstyled text-white-50">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>123 Hotel Street, City</li>
+                        <li><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@hotelhub.com</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white-50" />
+            <div class="text-center">
+                <p class="mb-0 text-white-50">&copy; 2024 HotelHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nouislider@15.6.0/dist/nouislider.min.js"></script>
+    <script src="assets/js/hotel2.js"></script>
+</body>
+
+</html>
